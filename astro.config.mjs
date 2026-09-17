@@ -27,7 +27,7 @@ export default defineConfig({
         },
       ],
     ],
-    shikiConfig: { theme: 'vesper', wrap: false },
+    shikiConfig: { theme: 'github-light', wrap: false },
   },
   devToolbar: { enabled: false },
 })

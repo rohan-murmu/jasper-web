@@ -1,84 +1,67 @@
 /* ==========================================================================
    Jasper — design tokens
 
-   The palette is lifted straight from the logo: warm amber mineral on a
-   near-black that is tinted brown rather than blue, so the accent never looks
-   pasted on. Type pairs a serif display face (the docs have a voice; the site
-   should too) with a neutral UI sans and a mono for the many code samples.
+   An old-desktop GUI: a tan desktop, peach windows, an orange title bar, and a
+   hard black outline on everything. The palette is the logo's own amber family,
+   so the mark belongs to the page instead of sitting on top of it — but it is
+   always placed on a bordered tile, never directly on the window surface, so it
+   never sinks into the peach.
+
+   No gradients anywhere. Flat fills, 2px outlines, and shadows that are a solid
+   offset rather than a blur. Everything is monospaced.
    ========================================================================== */
 
 :root {
-  /* brand — sampled from jasper-assets/icon.svg */
+  /* desktop + windows */
+  --desktop: #c8a288;
+  --desktop-2: #b9917a;
+  --win: #f2dcc8;
+  --win-2: #e9cdb6;
+  --win-3: #dfbda3;
+  --field: #fffcf8;
+
+  /* chrome */
+  --title: #e8621c;
+  --title-ink: #17140f;
+  --ink: #17140f;
+  --ink-soft: #443e37;
+  --ink-faint: #6c6157;
+
+  /* accents, straight off the reference sticker sheet */
   --amber: #f1c07d;
-  --amber-lit: #eec78d;
   --amber-deep: #cb8242;
-  --clay: #c38b59;
+  --yellow: #f5c243;
+  --purple: #7667c6;
+  --teal: #4bb5c1;
+  --red: #cd482a;
+  --green: #3f824e;
 
   /* semantic status */
-  --pass: #8fbf7a;
-  --fail: #e8756a;
-  --info: #7fa7c9;
+  --pass: var(--green);
+  --fail: var(--red);
+  --info: var(--purple);
 
-  /* surfaces (dark) */
-  --bg: #0d0c0b;
-  --bg-deep: #080807;
-  --surface: #151311;
-  --surface-2: #1c1917;
-  --surface-3: #241f1c;
-  --line: #2b2622;
-  --line-strong: #3a332d;
+  /* the retro shadow: an offset solid, never a blur */
+  --edge: 2px;
+  --drop: 4px 4px 0 var(--ink);
+  --drop-sm: 3px 3px 0 var(--ink);
+  --drop-lg: 6px 6px 0 var(--ink);
 
-  /* text */
-  --fg: #ece7e0;
-  --fg-muted: #a39a90;
-  --fg-faint: #6f675f;
-
-  --glow: rgba(241, 192, 125, 0.13);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(0, 0, 0, 0.35);
-
-  /* type */
-  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* type — the whole interface is monospaced */
+  --font-display: 'Space Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* rhythm */
-  --page: 1140px;
-  --prose: 760px;
-  --gutter: clamp(1.25rem, 4vw, 2.5rem);
-  --section-y: clamp(5rem, 11vw, 9rem);
-  --radius: 14px;
-  --radius-sm: 8px;
+  /* rhythm — generous, because dense mono needs air */
+  --page: 1180px;
+  --prose: 740px;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --section-y: clamp(4rem, 9vw, 7rem);
+  --radius: 4px;
+  --radius-sm: 3px;
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
-
-  color-scheme: dark;
-}
-
-:root[data-theme='light'] {
-  --amber: #a9631b;
-  --amber-lit: #8a4f13;
-  --amber-deep: #b5732c;
-  --clay: #8c6038;
-
-  --pass: #3f7d32;
-  --fail: #c0362b;
-  --info: #2f6389;
-
-  --bg: #faf7f2;
-  --bg-deep: #f2ece3;
-  --surface: #ffffff;
-  --surface-2: #f6f1e9;
-  --surface-3: #efe8dd;
-  --line: #e2d9cb;
-  --line-strong: #cdc0ad;
-
-  --fg: #1c1916;
-  --fg-muted: #5d554c;
-  --fg-faint: #8d8377;
-
-  --glow: rgba(169, 99, 27, 0.1);
-  --shadow: 0 1px 2px rgba(60, 44, 24, 0.06), 0 8px 28px rgba(60, 44, 24, 0.08);
 
   color-scheme: light;
 }
@@ -100,19 +83,34 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: 6rem;
+  scroll-padding-top: 6.5rem;
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--desktop);
+  color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: 0.945rem;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: 'cv05' 1, 'ss01' 1;
-  overflow-x: hidden;
+  overflow-x: clip;
+
+  /* A faint dot grid, the way a desktop wallpaper used to look. */
+  background-image: radial-gradient(rgba(23, 20, 15, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-attachment: fixed;
+}
+
+:where(pre, table, svg) {
+  max-width: 100%;
+}
+
+/* Grid and flex items default to min-width:auto, which refuses to shrink below
+   their content — that is what pushed terminals and code blocks off the right
+   edge of a phone. Everything here is allowed to shrink; the things that must
+   stay wide scroll inside their own box instead. */
+:where(.wrap, main, section) :where(div, section, article, aside, ul, ol, li, figure, pre) {
+  min-width: 0;
 }
 
 img,
@@ -135,14 +133,13 @@ button {
 }
 
 ::selection {
-  background: var(--amber);
-  color: var(--bg-deep);
+  background: var(--title);
+  color: var(--title-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--amber);
-  outline-offset: 3px;
-  border-radius: 3px;
+  outline: var(--edge) solid var(--ink);
+  outline-offset: 2px;
 }
 
 /* ==========================================================================
@@ -163,9 +160,103 @@ button {
 
 .rule {
   border: 0;
-  border-top: 1px solid var(--line);
+  border-top: var(--edge) solid var(--ink);
+  opacity: 0.18;
   max-width: var(--page);
   margin-inline: auto;
+}
+
+/* ==========================================================================
+   Window — the core chrome, used for every panel on the site
+   ========================================================================== */
+
+.win {
+  background: var(--win);
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--drop);
+  position: relative;
+  overflow: hidden;
+}
+
+.win--flush {
+  box-shadow: none;
+}
+
+.win--lg {
+  box-shadow: var(--drop-lg);
+}
+
+.win__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--title);
+  color: var(--title-ink);
+  border-bottom: var(--edge) solid var(--ink);
+  padding: 0.4rem 0.55rem 0.4rem 0.75rem;
+  min-height: 2rem;
+}
+
+.win__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The _ □ × cluster. Decorative — they are part of the costume, not controls. */
+.win__ctl {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+}
+
+.win__ctl i {
+  display: block;
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-radius: 1px;
+}
+
+.win__ctl i:first-child {
+  height: 2px;
+  border-width: 0 0 2px 0;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+.win__ctl i:last-child {
+  border: 0;
+  position: relative;
+  width: 12px;
+}
+
+.win__ctl i:last-child::before,
+.win__ctl i:last-child::after {
+  content: '';
+  position: absolute;
+  inset: 5px 0 auto;
+  height: 2px;
+  background: currentColor;
+}
+
+.win__ctl i:last-child::before {
+  transform: rotate(45deg);
+}
+
+.win__ctl i:last-child::after {
+  transform: rotate(-45deg);
+}
+
+.win__body {
+  padding: clamp(1.1rem, 2.5vw, 1.6rem);
 }
 
 /* ==========================================================================
@@ -176,181 +267,218 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.022em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   text-wrap: balance;
 }
 
 .display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.015em;
-  line-height: 1.04;
+  font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
 }
 
-.display em {
-  font-style: italic;
-  color: var(--amber);
+.display em,
+.section-title em {
+  font-style: normal;
+  color: var(--title);
 }
 
+/* A little tab, like a label stuck to the top of a panel. */
 .eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--amber-deep);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-}
-
-.eyebrow::before {
-  content: '';
-  width: 1.5rem;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.6;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--amber);
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--drop-sm);
+  padding: 0.22rem 0.6rem;
 }
 
 .section-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(2rem, 4.6vw, 3.1rem);
-  line-height: 1.08;
-  letter-spacing: -0.015em;
-  margin-top: 1.1rem;
-  max-width: 20ch;
-}
-
-.section-title em {
-  font-style: italic;
-  color: var(--amber);
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+  margin-top: 1.4rem;
+  max-width: 24ch;
 }
 
 .lede {
-  font-size: clamp(1.02rem, 1.6vw, 1.15rem);
-  color: var(--fg-muted);
-  max-width: 62ch;
+  font-size: clamp(0.9rem, 1.4vw, 1rem);
+  color: var(--ink-soft);
+  max-width: 68ch;
   margin-top: 1.25rem;
-  line-height: 1.7;
+  line-height: 1.78;
 }
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.875em;
+  font-size: 0.9em;
   font-feature-settings: 'liga' 0;
 }
 
 .k {
   font-family: var(--font-mono);
-  font-size: 0.86em;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  padding: 0.1em 0.42em;
-  color: var(--amber);
+  font-size: 0.87em;
+  background: var(--field);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 0.05em 0.36em;
+  color: var(--ink);
   white-space: nowrap;
 }
 
 /* ==========================================================================
-   Buttons
+   Buttons — they physically depress
    ========================================================================== */
 
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.72rem 1.3rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 550;
-  letter-spacing: -0.005em;
-  border: 1px solid transparent;
-  transition: transform 0.25s var(--ease), background 0.25s var(--ease),
-    border-color 0.25s var(--ease), color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.15rem;
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--win-2);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: var(--drop-sm);
+  transition: transform 0.08s linear, box-shadow 0.08s linear, background 0.15s var(--ease);
   white-space: nowrap;
 }
 
 .btn:hover {
-  transform: translateY(-2px);
+  background: var(--win-3);
 }
 
 .btn:active {
-  transform: translateY(0);
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
 }
 
 .btn--primary {
-  background: var(--amber);
-  color: #17120c;
-  box-shadow: 0 6px 24px -8px var(--amber);
+  background: var(--title);
+  color: var(--title-ink);
 }
 
 .btn--primary:hover {
-  background: var(--amber-lit);
-  box-shadow: 0 12px 32px -10px var(--amber);
-}
-
-:root[data-theme='light'] .btn--primary {
-  color: #fff;
+  background: #d4571a;
 }
 
 .btn--ghost {
-  border-color: var(--line-strong);
-  color: var(--fg);
-  background: var(--surface);
+  background: var(--field);
 }
 
 .btn--ghost:hover {
-  border-color: var(--amber-deep);
-  color: var(--amber);
+  background: var(--win-2);
 }
 
 .btn svg {
   flex: none;
 }
 
-/* ==========================================================================
-   Cards
-   ========================================================================== */
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  position: relative;
-  transition: border-color 0.3s var(--ease), background 0.3s var(--ease),
-    transform 0.3s var(--ease);
+/* Labels are nowrap by default so buttons keep their shape, but on a narrow
+   phone a long label has to be allowed to break rather than push the page wide. */
+@media (max-width: 620px) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+    max-width: 100%;
+  }
 }
 
-.card:hover {
-  border-color: var(--line-strong);
+/* ==========================================================================
+   Fields
+   ========================================================================== */
+
+.field {
+  background: var(--field);
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
 }
 
 /* ==========================================================================
    Scroll-reveal — every animated block opts in with [data-reveal]
    ========================================================================== */
 
-[data-reveal] {
+/* Both effects are gated on .js, which an inline script in <head> sets. With
+   scripting off the observer never runs, so the content has to start visible
+   rather than waiting for a class that will never arrive. Components read
+   `var(--run, running)` for the same reason. */
+html.js [data-reveal] {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  transform: translateY(14px);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
   transition-delay: var(--delay, 0ms);
 }
 
-[data-reveal].is-in {
+html.js [data-reveal].is-in {
   opacity: 1;
   transform: none;
 }
 
 /* Diagrams hold their animation until they are actually on screen. */
-[data-anim] {
+html.js [data-anim] {
   --run: paused;
 }
 
-[data-anim].is-in {
+html.js [data-anim].is-in {
   --run: running;
+}
+
+/* ==========================================================================
+   Responsive helpers
+   ========================================================================== */
+
+/* A hard line break that only applies once there is room for it. */
+.br-sm {
+  display: none;
+}
+
+@media (min-width: 620px) {
+  .br-sm {
+    display: inline;
+  }
+}
+
+/* Wide technical diagrams scroll rather than shrink to illegibility. */
+.scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink) var(--win-2);
+}
+
+.scroll-x::-webkit-scrollbar {
+  height: 12px;
+}
+
+.scroll-x::-webkit-scrollbar-track {
+  background: var(--win-2);
+  border-top: var(--edge) solid var(--ink);
+}
+
+.scroll-x::-webkit-scrollbar-thumb {
+  background: var(--amber-deep);
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 /* ==========================================================================
@@ -370,7 +498,7 @@ code {
     transition-duration: 0.001ms !important;
   }
 
-  [data-reveal] {
+  html.js [data-reveal] {
     opacity: 1;
     transform: none;
   }

@@ -20,8 +20,8 @@ const checkOutput = [
   { text: 'src/billing/invoice.ts:3', tone: 'plain' as const, pad: 4 },
   { text: 'imports "@/identity/internal/session" -> src/identity/internal/session.ts', tone: 'dim' as const, pad: 6 },
   { text: 'use the identity public API (src/identity/index.ts)', tone: 'dim' as const, pad: 6 },
-  { text: '→ Move the shared code behind a public entry point, or record a', tone: 'amber' as const, pad: 4 },
-  { text: '  decision that permits this edge.', tone: 'amber' as const, pad: 4 },
+  { text: '→ Move the shared code behind a public entry point, or record a', tone: 'accent' as const, pad: 4 },
+  { text: '  decision that permits this edge.', tone: 'accent' as const, pad: 4 },
   { text: 'why → .jasper/decisions/001-boundaries.yaml', tone: 'dim' as const, pad: 4 },
   { tone: 'blank' as const },
   { text: '✗ DEC-002  Datastore is PostgreSQL', tone: 'fail' as const },
@@ -42,7 +42,7 @@ const initOutput = [
   { text: '✗ Two Python HTTP clients: httpx and requests', tone: 'fail' as const, pad: 4 },
   { text: 'probably drift — pick one before enforcing', tone: 'dim' as const, pad: 6 },
   { tone: 'blank' as const },
-  { text: 'Proposed 2 decisions · 1 fact withheld', tone: 'amber' as const, pad: 2 },
+  { text: 'Proposed 2 decisions · 1 fact withheld', tone: 'accent' as const, pad: 2 },
 ]
 
 const questions = [
@@ -67,22 +67,20 @@ const tools = [
        Hero
        ================================================================== -->
   <section class="hero">
-    <div class="hero__ambient" aria-hidden="true"></div>
-
     <div class="wrap hero__inner">
       <span class="hero__badge">
         <i></i> v1 · one static binary · CLI&nbsp;+&nbsp;MCP
       </span>
 
       <h1 class="display hero__h1">
-        Your coding agent makes architectural decisions <em>every hour</em>.
+        Your agent decides.<br class="br-sm" /> <em>Your build enforces.</em>
       </h1>
 
       <p class="lede hero__lede">
-        Jasper records them, and tells the agent — or the build — the moment the
-        code stops honoring them. Not a spec generator. Not a workflow engine. It
-        sits <em>underneath</em> Claude Code, Cursor or Codex and does exactly one
-        thing.
+        Your coding agent makes architectural decisions every hour. Jasper records
+        them, and tells the agent — or the build — the moment the code stops
+        honoring them. Not a spec generator, not a workflow engine: it sits
+        <em> underneath</em> Claude Code, Cursor or Codex and does exactly one thing.
       </p>
 
       <div class="hero__cta">
@@ -144,7 +142,7 @@ const tools = [
       <header class="head" data-reveal>
         <span class="eyebrow">the problem</span>
         <h2 class="section-title">
-          A stale architecture doc is <em>worse than none</em>.
+          A stale architecture doc is <em>worse than none</em>
         </h2>
         <p class="lede">
           Generating the document is the easy half, and it is already free. The hard
@@ -182,7 +180,7 @@ const tools = [
     <div class="wrap">
       <header class="head head--center" data-reveal>
         <span class="eyebrow">the unit</span>
-        <h2 class="section-title">One YAML file. <em>Three audiences.</em></h2>
+        <h2 class="section-title">One YAML file. <em>Three audiences</em></h2>
         <p class="lede">
           Decisions live in <code class="k">.jasper/decisions/*.yaml</code>, committed
           to git — which already provides versioning, diffing, branching and review,
@@ -205,7 +203,7 @@ const tools = [
     <div class="wrap">
       <header class="head" data-reveal>
         <span class="eyebrow">how easy it is</span>
-        <h2 class="section-title">Three commands, and you are <em>already covered</em>.</h2>
+        <h2 class="section-title">Three commands. <em>Already covered</em></h2>
         <p class="lede">
           No config file to design, no architecture to invent up front, and no wall of
           failures on day one.
@@ -290,7 +288,7 @@ const tools = [
       <div class="loop-block" data-reveal>
         <header class="head head--center">
           <span class="eyebrow" style="justify-content:center">the loop</span>
-          <h3 class="section-title" style="margin-inline:auto">The cycle <em>is</em> the product.</h3>
+          <h3 class="section-title" style="margin-inline:auto">The cycle <em>is</em> the product</h3>
         </header>
         <LoopDiagram />
       </div>
@@ -306,7 +304,7 @@ const tools = [
     <div class="wrap">
       <header class="head" data-reveal>
         <span class="eyebrow">for coding agents</span>
-        <h2 class="section-title">It answers <em>before</em> the code exists.</h2>
+        <h2 class="section-title">It answers <em>before</em> the code exists</h2>
         <p class="lede">
           <code class="k">can_import</code> and <code class="k">can_add_dependency</code>
           take a file that is not on disk yet. A hypothetical is just a second snapshot,
@@ -367,7 +365,7 @@ const tools = [
     <div class="wrap">
       <header class="head" data-reveal>
         <span class="eyebrow">the primitives</span>
-        <h2 class="section-title">Ten checks. <em>One file each.</em></h2>
+        <h2 class="section-title">Ten checks. <em>One file each</em></h2>
         <p class="lede">
           A rule that compiles but enforces nothing is the failure mode this whole
           project exists to prevent — so every check is small enough to read in full.
@@ -385,7 +383,7 @@ const tools = [
       <div class="langs-block">
         <header class="head" data-reveal>
           <span class="eyebrow">languages</span>
-          <h3 class="section-title">Four today. Adding one is <em>one package</em>.</h3>
+          <h3 class="section-title">Four languages. <em>One package</em> to add one</h3>
           <p class="lede">
             A new language is one new package and one blank import — no existing file
             changes.
@@ -405,7 +403,7 @@ const tools = [
     <div class="wrap">
       <header class="head head--center" data-reveal>
         <span class="eyebrow">how it is built</span>
-        <h2 class="section-title">A pure function with a <em>thin impure shell</em>.</h2>
+        <h2 class="section-title">A pure function, a <em>thin impure shell</em></h2>
       </header>
 
       <div class="equation" data-reveal>
@@ -436,7 +434,7 @@ const tools = [
   <section class="cta">
     <div class="wrap cta__inner" data-reveal>
       <h2 class="display cta__h">
-        Record the decision <em>once</em>.<br />Let the build remember it.
+        Record it <em>once</em>.<br class="br-sm" /> Let the build remember.
       </h2>
 
       <button class="install install--lg" type="button" data-copy={INSTALL} aria-label="Copy install command">
@@ -453,7 +451,9 @@ const tools = [
           <Icon name="book" /> Read the docs
         </a>
         <a class="btn btn--ghost" href={site.repo} target="_blank" rel="noopener">
-          <Icon name="github" /> github.com/rohan-murmu/jasper
+          <Icon name="github" />
+          <span class="repo-long">github.com/rohan-murmu/jasper</span>
+          <span class="repo-short">View on GitHub</span>
         </a>
       </div>
     </div>
@@ -466,127 +466,98 @@ const tools = [
      ==================================================================== */
   .hero {
     position: relative;
-    padding-top: clamp(3.5rem, 9vw, 7rem);
-    padding-bottom: clamp(3rem, 7vw, 5rem);
+    padding-top: clamp(3rem, 8vw, 5.5rem);
+    padding-bottom: clamp(2.5rem, 6vw, 4rem);
     overflow: hidden;
   }
 
-  /* Slow warm bloom + a faint technical grid. Both drift, neither distracts. */
-  .hero__ambient {
-    position: absolute;
-    inset: -20% -10% auto;
-    height: 780px;
-    pointer-events: none;
-    background:
-      radial-gradient(48% 50% at 50% 30%, var(--glow), transparent 70%),
-      radial-gradient(30% 35% at 78% 12%, color-mix(in oklab, var(--clay) 12%, transparent), transparent 70%);
-    animation: bloom 16s ease-in-out infinite alternate;
-  }
+  /* Graph paper, the way a schematic would be drawn on it. */
   .hero::before {
     content: '';
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background-image: linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(70% 55% at 50% 22%, #000 0%, transparent 78%);
-    opacity: 0.4;
-  }
-  @keyframes bloom {
-    from {
-      transform: translate3d(-2%, 0, 0) scale(1);
-      opacity: 0.85;
-    }
-    to {
-      transform: translate3d(3%, 2%, 0) scale(1.08);
-      opacity: 1;
-    }
+    background-image: linear-gradient(rgba(23, 20, 15, 0.08) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(23, 20, 15, 0.08) 2px, transparent 2px);
+    background-size: 56px 56px;
   }
 
   .hero__inner {
     position: relative;
-    max-width: 62rem;
+    z-index: 1;
+    max-width: 58rem;
   }
 
   .hero__badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
+    font-weight: 700;
     font-size: 0.7rem;
-    letter-spacing: 0.08em;
-    color: var(--fg-muted);
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 0.32rem 0.8rem 0.32rem 0.6rem;
-    animation: fade-up 0.7s var(--ease) both;
+    letter-spacing: 0.04em;
+    background: var(--amber);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--drop-sm);
+    padding: 0.28rem 0.7rem;
   }
   .hero__badge i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--amber);
-    box-shadow: 0 0 8px var(--amber);
+    width: 8px;
+    height: 8px;
+    background: var(--title);
+    border: 1.5px solid var(--ink);
   }
 
   .hero__h1 {
-    font-size: clamp(2.5rem, 6.4vw, 4.7rem);
-    margin-top: 1.5rem;
-    max-width: 17ch;
-    animation: fade-up 0.8s var(--ease) 0.08s both;
+    font-size: clamp(1.95rem, 6vw, 4rem);
+    margin-top: 1.75rem;
+    max-width: 18ch;
   }
 
   .hero__lede {
-    animation: fade-up 0.8s var(--ease) 0.18s both;
+    margin-top: 1.5rem;
   }
   .hero__lede em {
-    color: var(--fg);
-    font-style: italic;
+    font-style: normal;
+    font-weight: 700;
+    color: var(--ink);
   }
 
   .hero__cta {
     display: flex;
-    gap: 0.7rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
-    margin-top: 2rem;
-    animation: fade-up 0.8s var(--ease) 0.28s both;
+    margin-top: 2.25rem;
   }
 
-  @keyframes fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
+  /* The install line reads as a text field with a copy button on the end. */
   .install {
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    margin-top: 1.5rem;
-    padding: 0.62rem 0.9rem;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 10px;
+    margin-top: 1.75rem;
+    padding: 0.6rem 0.85rem;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    color: var(--fg-muted);
+    color: var(--ink-soft);
     max-width: 100%;
-    transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
-    animation: fade-up 0.8s var(--ease) 0.36s both;
+    transition: transform 0.1s linear, box-shadow 0.1s linear;
   }
   .install:hover {
-    border-color: var(--amber-deep);
-    color: var(--fg);
+    background: var(--win);
+  }
+  .install:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
   }
   .install__prompt {
-    color: var(--amber);
+    color: var(--title);
+    font-weight: 700;
   }
   .install code {
     overflow: hidden;
@@ -596,58 +567,48 @@ const tools = [
   .install__icons {
     display: grid;
     margin-left: 0.2rem;
-    color: var(--fg-faint);
+    color: var(--ink-faint);
   }
   .install__icons > :global(svg) {
     grid-area: 1 / 1;
-    transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
   }
   .install__icons :global(.c-check) {
     opacity: 0;
-    transform: scale(0.5);
-    color: var(--pass);
+    color: var(--green);
   }
   .install.is-copied :global(.c-copy) {
     opacity: 0;
-    transform: scale(0.5);
   }
   .install.is-copied :global(.c-check) {
     opacity: 1;
-    transform: none;
   }
 
   .install__note {
-    margin-top: 0.7rem;
-    font-size: 0.8rem;
-    color: var(--fg-faint);
-    animation: fade-up 0.8s var(--ease) 0.42s both;
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
   }
 
   .hero__term {
     position: relative;
-    margin-top: clamp(2.5rem, 5vw, 4rem);
-    animation: fade-up 0.9s var(--ease) 0.5s both;
+    z-index: 1;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
   }
 
   /* ====================================================================
      Shared section furniture
      ==================================================================== */
   .section--tight {
-    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+    padding-block: clamp(3rem, 6vw, 4.5rem);
   }
 
   .head {
-    margin-bottom: clamp(2.25rem, 4vw, 3.25rem);
+    margin-bottom: clamp(2rem, 4vw, 3rem);
   }
   .head--center {
     text-align: center;
   }
-  .head--center .eyebrow {
-    justify-content: center;
-  }
-  .head--center .section-title {
-    margin-inline: auto;
-  }
+  .head--center .section-title,
   .head--center .lede {
     margin-inline: auto;
   }
@@ -661,46 +622,47 @@ const tools = [
      ==================================================================== */
   .qs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
+    grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+    gap: 1rem;
   }
   .q {
-    background: var(--surface);
-    padding: 1.6rem 1.5rem;
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
+    padding: 1.35rem 1.35rem 1.5rem;
   }
   .q__who {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--fg-faint);
+    color: var(--ink-faint);
   }
   .q__q {
-    margin-top: 0.6rem;
+    margin-top: 0.7rem;
     font-family: var(--font-display);
-    font-size: clamp(1.35rem, 2.6vw, 1.8rem);
-    line-height: 1.2;
-    color: var(--fg-muted);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+    line-height: 1.3;
+    color: var(--ink-soft);
   }
   .q--key {
-    background: color-mix(in oklab, var(--amber) 9%, var(--surface));
+    background: var(--amber);
+    box-shadow: var(--drop);
   }
   .q--key .q__who {
     color: var(--amber-deep);
   }
   .q--key .q__q {
-    color: var(--amber);
-    font-style: italic;
+    color: var(--ink);
   }
   .qs__note {
-    margin-top: 1.4rem;
-    font-size: 0.92rem;
-    color: var(--fg-muted);
-    max-width: 62ch;
+    margin-top: 1.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    max-width: 64ch;
   }
 
   /* ====================================================================
@@ -708,32 +670,35 @@ const tools = [
      ==================================================================== */
   .problem__body {
     display: grid;
-    gap: clamp(2rem, 4vw, 3rem);
+    gap: clamp(2rem, 4vw, 2.75rem);
   }
   .problem__snippet {
-    max-width: 62ch;
-    font-size: 0.95rem;
-    color: var(--fg-muted);
+    max-width: 64ch;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
     display: grid;
-    gap: 1rem;
+    gap: 1.1rem;
   }
   .snippet {
     margin: 0;
-    padding: 0.95rem 1.1rem;
-    background: var(--bg-deep);
-    border: 1px solid var(--line);
-    border-left: 2px solid var(--fail);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 0.9rem 1rem;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-left-width: 5px;
+    border-left-color: var(--red);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     overflow-x: auto;
-    color: var(--fg);
+    color: var(--ink);
   }
   .snippet .kw {
-    color: var(--clay);
+    color: var(--purple);
+    font-weight: 700;
   }
   .snippet .str {
-    color: var(--pass);
+    color: var(--green);
   }
 
   /* ====================================================================
@@ -744,11 +709,11 @@ const tools = [
     margin: 0;
     padding: 0;
     display: grid;
-    gap: clamp(3rem, 6vw, 4.5rem);
+    gap: clamp(2.75rem, 6vw, 4.5rem);
   }
   .step {
     display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
     gap: clamp(1.5rem, 4vw, 3rem);
     align-items: center;
   }
@@ -756,69 +721,77 @@ const tools = [
     order: 2;
   }
   .step__n {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    color: var(--amber-deep);
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    background: var(--title);
+    color: var(--title-ink);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 0.12rem 0.5rem;
   }
   .step__text h3 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    margin-top: 0.5rem;
+    font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+    margin-top: 0.85rem;
   }
   .step__text p {
-    margin-top: 0.85rem;
-    color: var(--fg-muted);
-    font-size: 0.95rem;
-    line-height: 1.7;
-    max-width: 46ch;
+    margin-top: 0.9rem;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.75;
+    max-width: 48ch;
   }
   .step__text em {
-    color: var(--fg);
-    font-style: italic;
+    font-style: normal;
+    font-weight: 700;
+    color: var(--ink);
   }
 
   .snips {
     display: grid;
-    gap: 0.7rem;
+    gap: 0.85rem;
   }
   .snip {
-    background: var(--bg-deep);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 0.85rem 1rem;
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
+    padding: 0.9rem 1rem 1rem;
   }
   .snip__label {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
-    letter-spacing: 0.14em;
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--fg-faint);
-    margin-bottom: 0.4rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.55rem;
   }
   .snip code {
+    display: block;
     font-family: var(--font-mono);
-    font-size: 0.79rem;
-    color: var(--fg);
+    font-size: 0.76rem;
+    color: var(--ink);
     word-break: break-word;
   }
   .snip b {
     font-weight: 700;
   }
   .snip .ok {
-    color: var(--pass);
+    color: var(--green);
   }
   .snip .bad {
-    color: var(--fail);
+    color: var(--red);
   }
   .snip .warn {
-    color: var(--amber);
+    color: var(--amber-deep);
   }
 
   .loop-block {
-    margin-top: clamp(4rem, 8vw, 6rem);
+    margin-top: clamp(3.5rem, 7vw, 5.5rem);
   }
 
   /* ====================================================================
@@ -826,111 +799,117 @@ const tools = [
      ==================================================================== */
   .agent__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
-    gap: clamp(1.75rem, 4vw, 3rem);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: clamp(1.75rem, 4vw, 2.75rem);
     align-items: start;
   }
 
   .tools {
-    background: var(--surface);
-    border: 1px solid var(--line);
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
     border-radius: var(--radius);
-    padding: 1.4rem 1.5rem;
+    box-shadow: var(--drop);
+    padding: 1.35rem 1.4rem 1.5rem;
     position: sticky;
-    top: 6rem;
+    top: 6.5rem;
   }
   .tools h3 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 1.4rem;
+    font-size: 1.15rem;
+    padding-bottom: 0.7rem;
     margin-bottom: 1rem;
+    border-bottom: var(--edge) solid var(--ink);
   }
   .tools ul {
     list-style: none;
-    margin: 0 0 1.2rem;
+    margin: 0 0 1.25rem;
     padding: 0;
     display: grid;
-    gap: 0.7rem;
+    gap: 0.8rem;
   }
   .tools li {
     display: grid;
-    gap: 0.15rem;
-    padding-bottom: 0.7rem;
-    border-bottom: 1px solid var(--line);
-  }
-  .tools li:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
+    gap: 0.2rem;
   }
   .tools li code {
     font-family: var(--font-mono);
-    font-size: 0.79rem;
-    color: var(--amber);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--field);
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    padding: 0.05rem 0.32rem;
+    justify-self: start;
   }
   .tools li span {
-    font-size: 0.8rem;
-    color: var(--fg-faint);
-    line-height: 1.5;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    line-height: 1.55;
   }
   .tools__note {
-    font-size: 0.82rem;
-    line-height: 1.65;
-    color: var(--fg-muted);
-    padding-top: 1rem;
-    border-top: 1px solid var(--line);
-    margin-bottom: 1.1rem;
+    font-size: 0.79rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    padding-top: 1.1rem;
+    border-top: var(--edge) solid var(--ink);
+    margin-bottom: 1.2rem;
   }
   .tools__note code {
     font-family: var(--font-mono);
-    font-size: 0.85em;
-    color: var(--clay);
+    font-size: 0.86em;
+    color: var(--ink);
   }
 
   .gate {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     gap: clamp(1.25rem, 3vw, 2.5rem);
-    align-items: stretch;
-    margin-top: clamp(2.5rem, 5vw, 4rem);
-    background: var(--surface);
-    border: 1px solid var(--line);
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
     border-radius: var(--radius);
+    box-shadow: var(--drop);
     padding: clamp(1.4rem, 3vw, 2rem);
   }
   .gate__div {
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--line-strong), transparent);
+    width: var(--edge);
+    background: var(--ink);
   }
   .gate__tag {
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
-    letter-spacing: 0.15em;
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--fg-faint);
+    background: var(--win-3);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 0.1rem 0.45rem;
   }
   .gate__half--hard .gate__tag {
-    color: var(--pass);
+    background: var(--green);
+    color: var(--field);
   }
   .gate__half h4 {
-    margin-top: 0.5rem;
-    font-size: 1.05rem;
-    font-weight: 600;
+    margin-top: 0.7rem;
+    font-size: 1rem;
   }
   .gate__half p {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--fg-muted);
-    line-height: 1.65;
+    margin-top: 0.55rem;
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    line-height: 1.7;
   }
 
   /* ====================================================================
      Checks / languages
      ==================================================================== */
   .after-checks {
-    margin-top: 2rem;
+    margin-top: 2.25rem;
   }
   .langs-block {
-    margin-top: clamp(4rem, 8vw, 6rem);
+    margin-top: clamp(3.5rem, 7vw, 5.5rem);
   }
 
   /* ====================================================================
@@ -939,63 +918,71 @@ const tools = [
   .equation {
     display: flex;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.25rem;
   }
   .equation code {
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: clamp(0.8rem, 1.9vw, 1.02rem);
-    background: var(--bg-deep);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 0.7rem 1.4rem;
-    color: var(--fg);
-    box-shadow: 0 0 40px -18px var(--amber);
+    font-size: clamp(0.72rem, 1.7vw, 0.92rem);
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
+    padding: 0.7rem 1.2rem;
+    color: var(--ink);
     overflow-x: auto;
     max-width: 100%;
     white-space: nowrap;
   }
   .equation span {
-    color: var(--amber);
+    color: var(--title);
+    font-weight: 700;
     padding-inline: 0.35rem;
   }
 
-  .arch-block {
-    margin-top: clamp(2.5rem, 5vw, 3.5rem);
-  }
+  .arch-block,
   .stats-block {
     margin-top: clamp(2.5rem, 5vw, 3.5rem);
   }
-
 
   /* ====================================================================
      CTA
      ==================================================================== */
   .cta {
     position: relative;
-    padding-block: clamp(5rem, 10vw, 8rem);
+    padding-block: clamp(3.5rem, 8vw, 6rem);
     text-align: center;
     overflow: hidden;
-    border-top: 1px solid var(--line);
-    background:
-      radial-gradient(60% 100% at 50% 100%, var(--glow), transparent 70%),
-      var(--bg-deep);
+    border-top: var(--edge) solid var(--ink);
+    background: var(--win-2);
+  }
+  .cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(rgba(23, 20, 15, 0.07) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(23, 20, 15, 0.07) 2px, transparent 2px);
+    background-size: 44px 44px;
+  }
+  .cta__inner {
+    position: relative;
+    z-index: 1;
   }
   .cta__h {
-    font-size: clamp(2rem, 5.2vw, 3.6rem);
-    max-width: 22ch;
+    font-size: clamp(1.7rem, 4.8vw, 3rem);
+    max-width: 24ch;
     margin-inline: auto;
   }
   .cta .install {
     margin-top: 2rem;
-    animation: none;
   }
   .cta__row {
     display: flex;
-    gap: 0.7rem;
+    gap: 0.75rem;
     justify-content: center;
     flex-wrap: wrap;
-    margin-top: 1.6rem;
+    margin-top: 1.75rem;
   }
 
   /* ====================================================================
@@ -1003,8 +990,7 @@ const tools = [
      ==================================================================== */
   @media (max-width: 900px) {
     .step,
-    .agent__grid,
-    .status {
+    .agent__grid {
       grid-template-columns: 1fr;
     }
     .step--flip .step__text {
@@ -1018,14 +1004,37 @@ const tools = [
     }
     .gate__div {
       width: auto;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--line-strong), transparent);
+      height: var(--edge);
     }
   }
 
+  /* The full repo URL cannot wrap and will not fit a 320px screen. */
+  .repo-short {
+    display: none;
+  }
+
   @media (max-width: 560px) {
+    .repo-long {
+      display: none;
+    }
+    .repo-short {
+      display: inline;
+    }
+
+    .install {
+      width: 100%;
+      justify-content: flex-start;
+    }
     .install code {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
+    }
+    .hero__cta,
+    .cta__row {
+      width: 100%;
+    }
+    .hero__cta .btn,
+    .cta__row .btn {
+      flex: 1 1 auto;
     }
   }
 </style>

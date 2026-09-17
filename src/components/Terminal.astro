@@ -1,7 +1,7 @@
 ---
 import Icon from './Icon.astro'
 
-export type Tone = 'fail' | 'pass' | 'dim' | 'amber' | 'plain' | 'blank'
+export type Tone = 'fail' | 'pass' | 'dim' | 'accent' | 'plain' | 'blank'
 export interface Line {
   text?: string
   tone?: Tone
@@ -22,19 +22,18 @@ interface Props {
 const {
   command,
   lines,
-  title = 'zsh',
+  title = 'terminal',
   type = 1.1,
   class: klass = '',
   copy = true,
 } = Astro.props
 
-const STAGGER = 0.09
+const STAGGER = 0.085
 ---
 
-<div class:list={['term', klass]} data-anim>
-  <div class="term__bar">
-    <span class="term__dots"><i></i><i></i><i></i></span>
-    <span class="term__title">{title}</span>
+<div class:list={['win term', klass]} data-anim>
+  <div class="win__bar">
+    <span class="win__title">{title}</span>
     {
       copy && (
         <button class="term__copy" type="button" data-copy={command} aria-label="Copy command">
@@ -43,126 +42,77 @@ const STAGGER = 0.09
         </button>
       )
     }
+    <span class="win__ctl" aria-hidden="true">
+      <i /><i /><i />
+    </span>
   </div>
 
-  <pre class="term__body"><code><span class="term__cmd" style={`--type:${type}s; --chars:${command.length}`}><span class="term__prompt">$</span> <span class="term__typed">{command}</span></span>{
-    lines.map((line, i) => (
-      <span
-        class:list={['term__line', `t-${line.tone ?? 'plain'}`]}
-        style={`--delay:${(type + 0.18 + i * STAGGER).toFixed(2)}s`}
-      >{'\n'}{' '.repeat(line.pad ?? 0)}{line.text ?? ''}</span>
-    ))
-  }<span class="term__caret" style={`--delay:${(type + 0.2 + lines.length * STAGGER).toFixed(2)}s`}></span></code></pre>
+  <div class="term__scroll scroll-x">
+    <pre class="term__body"><code><span class="term__cmd" style={`--type:${type}s; --chars:${command.length}`}><span class="term__prompt">$</span> <span class="term__typed">{command}</span></span>{
+      lines.map((line, i) => (
+        <span
+          class:list={['term__line', `t-${line.tone ?? 'plain'}`]}
+          style={`--delay:${(type + 0.18 + i * STAGGER).toFixed(2)}s`}
+        >{'\n'}{' '.repeat(line.pad ?? 0)}{line.text ?? ''}</span>
+      ))
+    }<span class="term__caret" style={`--delay:${(type + 0.2 + lines.length * STAGGER).toFixed(2)}s`}></span></code></pre>
+  </div>
 </div>
 
 <style>
-  .term {
-    background: var(--bg-deep);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    position: relative;
-  }
-
-  /* A faint warm bloom behind the glass, so the panel sits in the page rather
-     than on top of it. */
-  .term::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(120% 90% at 10% 0%, var(--glow), transparent 60%);
-  }
-
-  .term__bar {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0.85rem;
-    border-bottom: 1px solid var(--line);
-    background: var(--surface);
-  }
-
-  .term__dots {
-    display: inline-flex;
-    gap: 0.4rem;
-  }
-  .term__dots i {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--line-strong);
-  }
-  .term__dots i:first-child {
-    background: color-mix(in oklab, var(--fail) 70%, var(--line-strong));
-  }
-  .term__dots i:nth-child(2) {
-    background: color-mix(in oklab, var(--amber) 55%, var(--line-strong));
-  }
-  .term__dots i:last-child {
-    background: color-mix(in oklab, var(--pass) 60%, var(--line-strong));
-  }
-
-  .term__title {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--fg-faint);
-    letter-spacing: 0.04em;
-  }
-
   .term__copy {
     margin-left: auto;
     display: grid;
     place-items: center;
-    width: 1.7rem;
-    height: 1.7rem;
-    border-radius: 6px;
-    color: var(--fg-faint);
-    transition: color 0.2s var(--ease), background 0.2s var(--ease);
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    color: inherit;
   }
   .term__copy:hover {
-    color: var(--amber);
-    background: var(--surface-2);
+    background: rgba(255, 255, 255, 0.2);
   }
   .term__copy > :global(svg) {
     grid-area: 1 / 1;
-    transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
   }
   .term__copy :global(.c-check) {
     opacity: 0;
-    transform: scale(0.6);
-    color: var(--pass);
   }
   .term__copy.is-copied :global(.c-copy) {
     opacity: 0;
-    transform: scale(0.6);
   }
   .term__copy.is-copied :global(.c-check) {
     opacity: 1;
-    transform: none;
+  }
+
+  /* The console sheet: paper-white, like everything else on this desktop. */
+  .term__scroll {
+    background: var(--field);
+    max-width: 100%;
   }
 
   .term__body {
     margin: 0;
-    padding: 1.1rem 1.15rem 1.35rem;
+    padding: 1rem 1.1rem 1.25rem;
     font-family: var(--font-mono);
-    font-size: clamp(0.72rem, 1.45vw, 0.82rem);
-    line-height: 1.72;
-    overflow-x: auto;
+    /* Shrinks on a phone so more of each line lands before the scroll. */
+    font-size: clamp(0.62rem, 2.4vw, 0.78rem);
+    line-height: 1.75;
     tab-size: 2;
-    color: var(--fg-muted);
-    position: relative;
-    z-index: 1;
+    color: var(--ink-soft);
+    width: max-content;
+    min-width: 100%;
   }
 
   /* --- the typed command ------------------------------------------------- */
   .term__cmd {
     display: inline-block;
-    color: var(--fg);
+    color: var(--ink);
+    font-weight: 700;
   }
   .term__prompt {
-    color: var(--amber);
+    color: var(--title);
     user-select: none;
   }
   .term__typed {
@@ -172,7 +122,7 @@ const STAGGER = 0.09
     vertical-align: bottom;
     width: 0;
     animation: type var(--type) steps(var(--chars), end) forwards;
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
   @keyframes type {
     to {
@@ -184,33 +134,32 @@ const STAGGER = 0.09
   .term__line {
     display: inline;
     opacity: 0;
-    animation: line-in 0.32s var(--ease) forwards;
+    animation: line-in 0.01s linear forwards;
     animation-delay: var(--delay);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
   @keyframes line-in {
-    from {
-      opacity: 0;
-    }
     to {
       opacity: 1;
     }
   }
 
   .t-fail {
-    color: var(--fail);
+    color: var(--red);
+    font-weight: 700;
   }
   .t-pass {
-    color: var(--pass);
+    color: var(--green);
+    font-weight: 700;
   }
-  .t-amber {
-    color: var(--amber);
+  .t-accent {
+    color: var(--title);
   }
   .t-dim {
-    color: var(--fg-faint);
+    color: var(--ink-faint);
   }
   .t-plain {
-    color: var(--fg-muted);
+    color: var(--ink-soft);
   }
 
   .term__caret {
@@ -218,12 +167,12 @@ const STAGGER = 0.09
     width: 0.55em;
     height: 1.05em;
     margin-left: 0.15em;
-    background: var(--amber);
+    background: var(--title);
     vertical-align: text-bottom;
     opacity: 0;
     animation: caret-on 0.01s linear forwards, blink 1.05s steps(2, start) infinite;
     animation-delay: var(--delay), var(--delay);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
   @keyframes caret-on {
     to {

@@ -2,59 +2,58 @@
    Prose — the repo's markdown, rendered.
 
    The docs lean hard on tables, fenced code and box-drawing ASCII diagrams, so
-   those three get most of the attention here.
+   those three get most of the attention here. Everything keeps the desktop's
+   hard 2px outline rather than the hairline rules a normal docs theme uses.
    ========================================================================== */
 
 .prose {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--fg-muted);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--ink-soft);
 }
 
 .prose > * + * {
-  margin-top: 1.15rem;
+  margin-top: 1.2rem;
 }
 
 /* --- headings ------------------------------------------------------------ */
 
 .prose :is(h2, h3, h4) {
-  color: var(--fg);
-  scroll-margin-top: 6rem;
+  color: var(--ink);
+  scroll-margin-top: 6.5rem;
   position: relative;
+  font-family: var(--font-display);
+  font-weight: 700;
 }
 
 .prose h2 {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(1.7rem, 3.4vw, 2.1rem);
-  line-height: 1.2;
-  margin-top: 3.25rem;
-  padding-top: 1.75rem;
-  border-top: 1px solid var(--line);
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  line-height: 1.25;
+  margin-top: 3rem;
+  padding-top: 1.6rem;
+  border-top: var(--edge) solid var(--ink);
 }
 
 .prose h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-top: 2.5rem;
+  font-size: 1.1rem;
+  margin-top: 2.4rem;
 }
 
 .prose h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 2rem;
+  font-size: 0.95rem;
+  margin-top: 1.9rem;
 }
 
 /* An anchor link that only shows on hover — findable, never noisy. */
 .prose :is(h2, h3, h4) > a.anchor {
   position: absolute;
-  left: -1.35rem;
+  left: -1.4rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--amber-deep);
+  color: var(--title);
   opacity: 0;
   font-size: 0.8em;
-  transition: opacity 0.2s var(--ease);
+  transition: opacity 0.15s var(--ease);
   text-decoration: none;
 }
 
@@ -71,24 +70,26 @@
 /* --- text ---------------------------------------------------------------- */
 
 .prose strong {
-  color: var(--fg);
-  font-weight: 600;
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .prose em {
-  color: var(--fg);
+  color: var(--ink);
 }
 
 .prose a:not(.anchor) {
-  color: var(--amber);
+  color: var(--ink);
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--amber) 35%, transparent);
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--title);
   text-underline-offset: 3px;
-  transition: text-decoration-color 0.2s var(--ease);
 }
 
 .prose a:not(.anchor):hover {
-  text-decoration-color: var(--amber);
+  background: var(--title);
+  color: var(--title-ink);
+  text-decoration-color: transparent;
 }
 
 .prose :is(ul, ol) {
@@ -98,7 +99,7 @@
 }
 
 .prose li::marker {
-  color: var(--amber-deep);
+  color: var(--title);
 }
 
 .prose li > ul,
@@ -107,15 +108,17 @@
 }
 
 .prose blockquote {
-  border-left: 2px solid var(--amber-deep);
-  padding-left: 1.1rem;
-  color: var(--fg-muted);
-  font-style: italic;
+  border-left: 5px solid var(--title);
+  background: var(--win-2);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.85rem 1.1rem;
+  color: var(--ink-soft);
 }
 
 .prose hr {
   border: 0;
-  border-top: 1px solid var(--line);
+  border-top: var(--edge) solid var(--ink);
+  opacity: 0.25;
   margin-block: 2.5rem;
 }
 
@@ -123,12 +126,12 @@
 
 .prose :not(pre) > code {
   font-family: var(--font-mono);
-  font-size: 0.855em;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  padding: 0.11em 0.4em;
-  color: var(--amber);
+  font-size: 0.87em;
+  background: var(--field);
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  padding: 0.04em 0.34em;
+  color: var(--ink);
   word-break: break-word;
 }
 
@@ -139,15 +142,15 @@
 /* --- fenced code --------------------------------------------------------- */
 
 .prose pre {
-  background: var(--bg-deep) !important;
-  border: 1px solid var(--line);
+  background: var(--field) !important;
+  border: var(--edge) solid var(--ink);
   border-radius: var(--radius);
-  padding: 1.05rem 1.15rem;
+  box-shadow: var(--drop-sm);
+  padding: 1rem 1.1rem;
   overflow-x: auto;
-  font-size: 0.8rem;
-  line-height: 1.7;
-  margin-top: 1.4rem;
-  position: relative;
+  font-size: 0.76rem;
+  line-height: 1.75;
+  margin-top: 1.5rem;
 }
 
 .prose pre code {
@@ -159,72 +162,66 @@
   color: inherit;
 }
 
-/* Shiki ships a light palette in its own variables; the dark theme it was built
-   with already matches this page, so only light mode needs the override. */
-:root[data-theme='light'] .prose pre {
-  background: var(--surface-2) !important;
-}
-
-:root[data-theme='light'] .prose pre,
-:root[data-theme='light'] .prose pre span {
-  color: var(--shiki-light, inherit) !important;
-}
-
 /* --- tables -------------------------------------------------------------- */
 
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
-  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  margin-top: 1.6rem;
   display: block;
   overflow-x: auto;
+  background: var(--field);
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--drop-sm);
 }
 
 .prose thead th {
   text-align: left;
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   font-size: 0.68rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--fg-faint);
-  font-weight: 500;
+  color: var(--ink);
+  background: var(--amber);
+  font-weight: 700;
   padding: 0.55rem 0.9rem;
-  border-bottom: 1px solid var(--line-strong);
+  border-bottom: var(--edge) solid var(--ink);
   white-space: nowrap;
 }
 
 .prose tbody td {
-  padding: 0.7rem 0.9rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1.5px solid var(--win-3);
   vertical-align: top;
 }
 
-.prose tbody tr {
-  transition: background 0.2s var(--ease);
+.prose tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .prose tbody tr:hover {
-  background: var(--surface);
+  background: var(--win);
 }
 
 .prose tbody td:first-child {
-  color: var(--fg);
+  color: var(--ink);
 }
 
 /* --- figures ------------------------------------------------------------- */
 
 .prose img {
   border-radius: var(--radius);
-  border: 1px solid var(--line);
+  border: var(--edge) solid var(--ink);
 }
 
 .prose kbd {
   font-family: var(--font-mono);
   font-size: 0.8em;
-  border: 1px solid var(--line-strong);
-  border-bottom-width: 2px;
-  border-radius: 5px;
-  padding: 0.1em 0.4em;
-  background: var(--surface-2);
+  border: var(--edge) solid var(--ink);
+  border-bottom-width: 3px;
+  border-radius: var(--radius-sm);
+  padding: 0.05em 0.4em;
+  background: var(--win-2);
 }

@@ -1,16 +1,14 @@
 ---
 /**
- * The pre-flight exchange, played as a sequence. The point being made is the
- * timing: this happens while the agent is still deciding, for a file that does
- * not exist on disk yet.
+ * The pre-flight exchange, played as a sequence. The point is the timing: this
+ * happens while the agent is still deciding, for a file that does not exist on
+ * disk yet — so the denial arrives as a dialog box, before anything is written.
  */
 ---
 
 <div class="seq" data-anim>
-  <div class="seq__rail" aria-hidden="true"></div>
-
   <ol class="seq__list">
-    <li class="msg msg--agent" style="--i:0">
+    <li class="msg" style="--i:0">
       <span class="msg__who">coding agent</span>
       <div class="msg__body">
         <p class="msg__say">“I need to write the tax calculator. It needs the database.”</p>
@@ -24,33 +22,50 @@
     </li>
 
     <li class="msg msg--think" style="--i:1" aria-hidden="true">
-      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="bar">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </span>
       <span class="msg__meta">one snapshot, one hypothetical edge, 5&nbsp;ms</span>
     </li>
 
-    <li class="msg msg--jasper" style="--i:2">
+    <li class="msg msg--verdict" style="--i:2">
       <span class="msg__who">jasper</span>
-      <div class="msg__body verdict">
-        <div class="verdict__head">
-          <span class="verdict__tag">DENIED</span>
-          <span class="verdict__sum"
-            >import of <code>"pg"</code> would violate a recorded decision</span
-          >
+
+      <div class="win win--lg dialog">
+        <div class="win__bar dialog__bar">
+          <span class="win__title">Denied</span>
+          <span class="win__ctl" aria-hidden="true"><i></i><i></i><i></i></span>
         </div>
-        <dl class="verdict__grid">
-          <dt>decision</dt>
-          <dd><strong>DEC-002</strong> Datastore is PostgreSQL</dd>
-          <dt>rule</dt>
-          <dd>the database driver stays behind the db layer</dd>
-          <dt>fix</dt>
-          <dd>Access it through the layer at <code>src/db/**</code> instead.</dd>
-          <dt>why</dt>
-          <dd><code>.jasper/decisions/002-datastore.yaml</code></dd>
-        </dl>
+
+        <div class="dialog__body">
+          <div class="dialog__lead">
+            <span class="dialog__icon" aria-hidden="true">!</span>
+            <p>
+              Import of <code>"pg"</code> by <code>src/billing/tax.ts</code> would
+              violate a recorded decision.
+            </p>
+          </div>
+
+          <dl class="dialog__grid">
+            <dt>decision</dt>
+            <dd><strong>DEC-002</strong> Datastore is PostgreSQL</dd>
+            <dt>rule</dt>
+            <dd>the database driver stays behind the db layer</dd>
+            <dt>fix</dt>
+            <dd>Access it through the layer at <code>src/db/**</code> instead.</dd>
+            <dt>why</dt>
+            <dd><code>.jasper/decisions/002-datastore.yaml</code></dd>
+          </dl>
+
+          <div class="dialog__actions">
+            <span class="btn btn--ghost btn--sm">Explain</span>
+            <span class="btn btn--primary btn--sm">OK</span>
+          </div>
+        </div>
       </div>
     </li>
 
-    <li class="msg msg--agent msg--done" style="--i:3">
+    <li class="msg msg--done" style="--i:3">
       <span class="msg__who">coding agent</span>
       <div class="msg__body">
         <code class="msg__call ok"
@@ -58,16 +73,7 @@
           <span class="str">'@/db'</span></code
         >
         <span class="msg__meta ok">
-          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"
-            ><path
-              d="m3.5 8.4 3 3 6-6.8"
-              stroke="currentColor"
-              stroke-width="1.8"
-              fill="none"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path></svg
-          >
-          the violation was never written, so it never has to be found
+          <b>✓</b> the violation was never written, so it never has to be found
         </span>
       </div>
     </li>
@@ -77,32 +83,6 @@
 <style>
   .seq {
     position: relative;
-    display: grid;
-    gap: 0;
-  }
-
-  .seq__rail {
-    position: absolute;
-    left: 7px;
-    top: 14px;
-    bottom: 24px;
-    width: 2px;
-    background: linear-gradient(
-      to bottom,
-      var(--line-strong),
-      var(--amber) 45%,
-      var(--pass) 92%,
-      transparent
-    );
-    transform-origin: top;
-    transform: scaleY(0);
-    animation: rail 1.9s var(--ease-io) 0.2s forwards;
-    animation-play-state: var(--run, paused);
-  }
-  @keyframes rail {
-    to {
-      transform: scaleY(1);
-    }
   }
 
   .seq__list {
@@ -110,43 +90,44 @@
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 1.6rem;
+    gap: 1.75rem;
   }
 
   .msg {
     position: relative;
-    padding-left: 2.4rem;
+    padding-left: 2.1rem;
     opacity: 0;
-    transform: translateY(14px);
-    animation: msg-in 0.6s var(--ease) forwards;
-    animation-delay: calc(0.45s + var(--i) * 0.75s);
-    animation-play-state: var(--run, paused);
+    animation: msg-in 0.4s var(--ease) forwards;
+    animation-delay: calc(0.35s + var(--i) * 0.7s);
+    animation-play-state: var(--run, running);
   }
   @keyframes msg-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
     to {
       opacity: 1;
       transform: none;
     }
   }
 
+  /* A square bullet on the rail, filled when Jasper is the one speaking. */
   .msg::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.35rem;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid var(--line-strong);
+    top: 0.3rem;
+    width: 13px;
+    height: 13px;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
   }
-  .msg--jasper::before {
-    border-color: var(--amber);
-    background: var(--amber);
-    box-shadow: 0 0 0 4px var(--glow);
+  .msg--verdict::before {
+    background: var(--red);
   }
   .msg--done::before {
-    border-color: var(--pass);
+    background: var(--green);
   }
   .msg--think::before {
     display: none;
@@ -154,174 +135,218 @@
 
   .msg__who {
     display: block;
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
+    font-weight: 700;
     font-size: 0.68rem;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--fg-faint);
-    margin-bottom: 0.5rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.6rem;
   }
-  .msg--jasper .msg__who {
-    color: var(--amber-deep);
+  .msg--verdict .msg__who {
+    color: var(--red);
   }
 
   .msg__body {
     display: grid;
-    gap: 0.6rem;
+    gap: 0.7rem;
   }
 
   .msg__say {
-    color: var(--fg-muted);
-    font-size: 0.95rem;
-    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
   }
 
   .msg__call {
     display: block;
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-left: 2px solid var(--line-strong);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    padding: 0.7rem 0.9rem;
-    color: var(--fg);
+    font-size: 0.78rem;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--drop-sm);
+    padding: 0.7rem 0.85rem;
+    color: var(--ink);
     overflow-x: auto;
     white-space: nowrap;
   }
-  .msg__call.ok {
-    border-left-color: var(--pass);
-  }
   .msg__call .fn {
-    color: var(--amber);
+    color: var(--title);
+    font-weight: 700;
   }
   .msg__call .arg {
-    color: var(--info);
+    color: var(--purple);
   }
   .msg__call .str {
-    color: var(--pass);
+    color: var(--green);
   }
   .msg__call .kw {
-    color: var(--clay);
+    color: var(--purple);
+    font-weight: 700;
   }
 
   .msg__meta {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.78rem;
-    color: var(--fg-faint);
-    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-faint);
   }
   .msg__meta.ok {
-    color: var(--pass);
+    color: var(--green);
+  }
+  .msg__meta b {
+    font-size: 0.9rem;
   }
 
-  /* --- thinking --------------------------------------------------------- */
+  /* --- the "working" progress bar, straight off the reference sheet ------- */
   .msg--think {
-    padding-left: 2.4rem;
+    padding-left: 2.1rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-  }
-  .dots {
-    display: inline-flex;
-    gap: 0.28rem;
-  }
-  .dots i {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--amber-deep);
-    animation: bob 1.2s ease-in-out infinite;
-    animation-play-state: var(--run, paused);
-  }
-  .dots i:nth-child(2) {
-    animation-delay: 0.15s;
-  }
-  .dots i:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-  @keyframes bob {
-    0%,
-    60%,
-    100% {
-      transform: translateY(0);
-      opacity: 0.35;
-    }
-    30% {
-      transform: translateY(-4px);
-      opacity: 1;
-    }
-  }
-
-  /* --- the verdict card -------------------------------------------------- */
-  .verdict {
-    background: color-mix(in oklab, var(--fail) 6%, var(--surface));
-    border: 1px solid color-mix(in oklab, var(--fail) 40%, var(--line));
-    border-radius: var(--radius);
-    padding: 1rem 1.1rem;
-    gap: 0.9rem;
-  }
-
-  .verdict__head {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
+    gap: 0.8rem;
     flex-wrap: wrap;
   }
-  .verdict__tag {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    color: var(--fail);
-    border: 1px solid color-mix(in oklab, var(--fail) 50%, transparent);
-    border-radius: 4px;
-    padding: 0.18rem 0.45rem;
+  .bar {
+    display: inline-flex;
+    gap: 3px;
+    padding: 3px;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius-sm);
   }
-  .verdict__sum {
-    font-size: 0.92rem;
-    color: var(--fg);
+  .bar i {
+    width: 9px;
+    height: 15px;
+    background: var(--win-3);
+    animation: fill 1.6s steps(1, end) infinite;
+    animation-play-state: var(--run, running);
+  }
+  .bar i:nth-child(n) {
+    animation-delay: calc((var(--n, 0)) * 0s);
+  }
+  .bar i:nth-child(1) { animation-delay: 0s; }
+  .bar i:nth-child(2) { animation-delay: 0.08s; }
+  .bar i:nth-child(3) { animation-delay: 0.16s; }
+  .bar i:nth-child(4) { animation-delay: 0.24s; }
+  .bar i:nth-child(5) { animation-delay: 0.32s; }
+  .bar i:nth-child(6) { animation-delay: 0.4s; }
+  .bar i:nth-child(7) { animation-delay: 0.48s; }
+  .bar i:nth-child(8) { animation-delay: 0.56s; }
+  .bar i:nth-child(9) { animation-delay: 0.64s; }
+  .bar i:nth-child(10) { animation-delay: 0.72s; }
+  .bar i:nth-child(11) { animation-delay: 0.8s; }
+  .bar i:nth-child(12) { animation-delay: 0.88s; }
+  @keyframes fill {
+    0%,
+    60% {
+      background: var(--purple);
+    }
+    61%,
+    100% {
+      background: var(--win-3);
+    }
   }
 
-  .verdict__grid {
+  /* --- the denial dialog -------------------------------------------------- */
+  .dialog {
+    max-width: 34rem;
+  }
+  .dialog__bar {
+    background: var(--red);
+    color: var(--field);
+  }
+  .dialog__body {
+    padding: 1.15rem 1.2rem 1rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .dialog__lead {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+  .dialog__icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    background: var(--red);
+    color: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .dialog__lead p {
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  .dialog__grid {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.4rem 1rem;
+    gap: 0.45rem 1rem;
     margin: 0;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    padding-top: 0.9rem;
+    border-top: var(--edge) solid var(--ink);
   }
-  .verdict__grid dt {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
+  .dialog__grid dt {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--fg-faint);
-    padding-top: 0.16rem;
+    color: var(--ink-faint);
+    padding-top: 0.2rem;
   }
-  .verdict__grid dd {
+  .dialog__grid dd {
     margin: 0;
-    color: var(--fg-muted);
+    color: var(--ink-soft);
+    line-height: 1.6;
   }
-  .verdict__grid strong {
-    color: var(--amber);
-    font-weight: 600;
+  .dialog__grid strong {
+    color: var(--ink);
   }
-  .verdict__grid code,
-  .verdict__sum code {
+  .dialog__grid code,
+  .dialog__lead code {
     font-family: var(--font-mono);
     font-size: 0.86em;
-    color: var(--amber);
+    background: var(--win-2);
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    padding: 0.02em 0.28em;
+  }
+
+  .dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: var(--edge) solid var(--ink);
+  }
+  .btn--sm {
+    padding: 0.38rem 1rem;
+    font-size: 0.74rem;
   }
 
   @media (max-width: 520px) {
-    .verdict__grid {
+    .dialog__grid {
       grid-template-columns: 1fr;
-      gap: 0.15rem;
+      gap: 0.1rem;
     }
-    .verdict__grid dd {
-      margin-bottom: 0.5rem;
+    .dialog__grid dd {
+      margin-bottom: 0.6rem;
+    }
+    .dialog__actions {
+      justify-content: stretch;
+    }
+    .dialog__actions .btn {
+      flex: 1;
     }
   }
 </style>

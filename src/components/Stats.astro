@@ -1,19 +1,30 @@
 ---
+/**
+ * Four counters, each with a segmented meter that fills as the number counts up
+ * — the reference sheet's loading bar, repurposed as a readout.
+ */
 const stats = [
-  { to: 10, suffix: '', label: 'check primitives', note: 'one file each' },
-  { to: 4, suffix: '', label: 'languages', note: 'Go · TS · Python · Rust' },
-  { to: 1, suffix: '', label: 'dependency', note: 'gopkg.in/yaml.v3' },
-  { to: 5, suffix: 'ms', label: 'full check', note: 'on Jasper’s own repo' },
+  { to: 10, suffix: '', segs: 10, fill: 10, label: 'check primitives', note: 'one file each' },
+  { to: 4, suffix: '', segs: 10, fill: 4, label: 'languages', note: 'Go · TS · Python · Rust' },
+  { to: 1, suffix: '', segs: 10, fill: 1, label: 'dependency', note: 'gopkg.in/yaml.v3' },
+  { to: 5, suffix: 'ms', segs: 10, fill: 2, label: 'full check', note: 'on Jasper’s own repo' },
 ]
 ---
 
-<ul class="stats" data-reveal>
+<ul class="stats" data-anim>
   {
-    stats.map((s) => (
-      <li class="stat">
+    stats.map((s, i) => (
+      <li class="stat" data-reveal style={`--delay:${i * 80}ms`}>
         <span class="stat__num" data-count={s.to} data-suffix={s.suffix}>
           0{s.suffix}
         </span>
+
+        <span class="meter" aria-hidden="true">
+          {Array.from({ length: s.segs }).map((_, n) => (
+            <i class:list={{ 'is-on': n < s.fill }} style={`--n:${n}; --base:${i * 0.08}s`} />
+          ))}
+        </span>
+
         <span class="stat__label">{s.label}</span>
         <span class="stat__note">{s.note}</span>
       </li>
@@ -61,41 +72,75 @@ const stats = [
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
   }
 
   .stat {
-    background: var(--surface);
-    padding: 1.4rem 1.25rem;
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
+    padding: 1.15rem 1.2rem 1.25rem;
     display: grid;
-    gap: 0.2rem;
-    transition: background 0.3s var(--ease);
+    gap: 0.3rem;
+    transition: transform 0.1s linear, box-shadow 0.1s linear;
   }
   .stat:hover {
-    background: var(--surface-2);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--drop);
   }
 
   .stat__num {
     font-family: var(--font-display);
-    font-size: clamp(2.1rem, 4.5vw, 2.9rem);
+    font-size: clamp(2rem, 4.2vw, 2.6rem);
+    font-weight: 700;
     line-height: 1;
-    color: var(--amber);
     font-variant-numeric: tabular-nums;
   }
+
+  .meter {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    margin-block: 0.7rem 0.55rem;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: 2px;
+  }
+  .meter i {
+    flex: 1;
+    height: 11px;
+    background: var(--win-3);
+  }
+  .meter i.is-on {
+    background: var(--purple);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: seg 0.16s steps(1, end) forwards;
+    animation-delay: calc(var(--base) + var(--n) * 0.07s);
+    animation-play-state: var(--run, running);
+  }
+  @keyframes seg {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
   .stat__label {
-    font-size: 0.9rem;
-    font-weight: 550;
-    color: var(--fg);
-    margin-top: 0.35rem;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
   }
   .stat__note {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--fg-faint);
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .meter i.is-on {
+      transform: none;
+    }
   }
 </style>

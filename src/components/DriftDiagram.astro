@@ -6,107 +6,156 @@
 ---
 
 <figure class="drift" data-anim>
-  <svg viewBox="0 0 760 360" role="img" aria-labelledby="drift-t drift-d">
-    <title id="drift-t">Architectural drift over six weeks</title>
-    <desc id="drift-d">
-      The recorded decision holds a straight line while the codebase curves away from
-      it. The compiler and the test suite keep passing throughout; only the question
-      "is this what we agreed?" comes back false.
-    </desc>
+  <div class="drift__scroll scroll-x">
+    <svg viewBox="0 0 760 372" role="img" aria-labelledby="drift-t drift-d">
+      <title id="drift-t">Architectural drift over six weeks</title>
+      <desc id="drift-d">
+        The recorded decision holds a straight line while the codebase curves away
+        from it. The compiler and the test suite keep passing throughout; only the
+        question "is this what we agreed?" comes back false.
+      </desc>
 
-    <defs>
-      <linearGradient id="gapFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="var(--fail)" stop-opacity="0.32" />
-        <stop offset="100%" stop-color="var(--fail)" stop-opacity="0.03" />
-      </linearGradient>
-      <linearGradient id="codeStroke" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="var(--fg-muted)" />
-        <stop offset="55%" stop-color="var(--clay)" />
-        <stop offset="100%" stop-color="var(--fail)" />
-      </linearGradient>
-    </defs>
+      <defs>
+        <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="7" stroke="var(--red)" stroke-width="3" opacity="0.32" />
+        </pattern>
+      </defs>
 
-    <!-- time axis -->
-    <line class="axis" x1="70" y1="300" x2="700" y2="300" />
-    {
-      [
-        [70, 'day one'],
-        [290, 'week two'],
-        [510, 'week four'],
-        [690, 'week six'],
-      ].map(([x, label]) => (
-        <g class="tick">
-          <line x1={x} y1="295" x2={x} y2="305" />
-          <text x={x} y="324" text-anchor={x === 70 ? 'start' : x === 690 ? 'end' : 'middle'}>
-            {label}
-          </text>
+      <!-- time axis -->
+      <line class="axis" x1="70" y1="306" x2="700" y2="306" />
+      {
+        [
+          [70, 'day one', 'start'],
+          [290, 'week two', 'middle'],
+          [510, 'week four', 'middle'],
+          [694, 'week six', 'end'],
+        ].map(([x, label, anchor]) => (
+          <g class="tick">
+            <line x1={x} y1="300" x2={x} y2="312" />
+            <text x={x} y="330" text-anchor={anchor as string}>
+              {label}
+            </text>
+          </g>
+        ))
+      }
+
+      <!-- the widening gap between intent and code -->
+      <path
+        class="gap"
+        d="M70 126 H700 V238 C560 238 400 166 240 128 C180 116 120 124 70 126 Z"
+        fill="url(#hatch)"
+      />
+
+      <!-- what was agreed: a straight line that does not move -->
+      <line class="agreed" x1="70" y1="126" x2="700" y2="126" />
+      <g class="label label--agreed">
+        <text x="70" y="108">what we agreed</text>
+        <text class="sub" x="70" y="92">.jasper/decisions/001-boundaries.yaml</text>
+      </g>
+
+      <!-- what the code actually did -->
+      <path
+        class="code"
+        d="M70 126 C120 124 180 116 240 128 C400 166 560 238 700 238"
+        fill="none"
+      />
+      <g class="label label--code">
+        <text x="700" y="268" text-anchor="end">what the code does</text>
+      </g>
+
+      <!-- commits along the way: each one individually reasonable -->
+      {
+        [
+          [240, 128],
+          [370, 158],
+          [480, 196],
+          [590, 220],
+        ].map(([cx, cy], i) => <rect class="commit" x={cx - 5} y={cy - 5} width="10" height="10" style={`--i:${i}`} />)
+      }
+      <rect class="head" x="694" y="232" width="12" height="12" />
+
+      <!-- the verdicts -->
+      <g class="verdicts">
+        <g class="verdict" style="--i:0">
+          <rect class="vs" x="74" y="22" width="152" height="36" rx="3" />
+          <rect class="vb" x="70" y="18" width="152" height="36" rx="3" />
+          <text x="86" y="41">compiler</text>
+          <text class="mark ok" x="200" y="42">✓</text>
         </g>
-      ))
-    }
-
-    <!-- the widening gap between intent and code -->
-    <path
-      class="gap"
-      d="M70 120 H700 V232 C560 232 400 160 240 122 C180 110 120 118 70 120 Z"
-      fill="url(#gapFill)"
-    />
-
-    <!-- what was agreed: a straight line that does not move -->
-    <line class="agreed" x1="70" y1="120" x2="700" y2="120" />
-    <g class="label label--agreed">
-      <text x="70" y="102">what we agreed</text>
-      <text class="sub" x="70" y="86">.jasper/decisions/001-boundaries.yaml</text>
-    </g>
-
-    <!-- what the code actually did -->
-    <path
-      class="code"
-      d="M70 120 C120 118 180 110 240 122 C400 160 560 232 700 232"
-      fill="none"
-      stroke="url(#codeStroke)"
-    />
-    <circle class="head" r="6" cx="700" cy="232" />
-    <g class="label label--code">
-      <text x="700" y="262" text-anchor="end">what the code does</text>
-    </g>
-
-    <!-- commits along the way: each one individually reasonable -->
-    {
-      [
-        [240, 122],
-        [370, 152],
-        [480, 190],
-        [590, 214],
-      ].map(([cx, cy], i) => (
-        <circle class="commit" cx={cx} cy={cy} r="4" style={`--i:${i}`} />
-      ))
-    }
-
-    <!-- the verdicts -->
-    <g class="verdicts">
-      <g class="verdict v-ok" style="--i:0">
-        <rect x="72" y="18" width="150" height="34" rx="17" />
-        <text x="95" y="40">compiler</text>
-        <text class="mark ok" x="200" y="41">✓</text>
+        <g class="verdict" style="--i:1">
+          <rect class="vs" x="242" y="22" width="152" height="36" rx="3" />
+          <rect class="vb" x="238" y="18" width="152" height="36" rx="3" />
+          <text x="254" y="41">test suite</text>
+          <text class="mark ok" x="368" y="42">✓</text>
+        </g>
+        <g class="verdict verdict--bad" style="--i:2">
+          <rect class="vs" x="410" y="22" width="220" height="36" rx="3" />
+          <rect class="vb" x="406" y="18" width="220" height="36" rx="3" />
+          <text x="422" y="41">is this what we agreed?</text>
+          <text class="mark bad" x="604" y="42">✗</text>
+        </g>
       </g>
-      <g class="verdict v-ok" style="--i:1">
-        <rect x="236" y="18" width="150" height="34" rx="17" />
-        <text x="259" y="40">test suite</text>
-        <text class="mark ok" x="364" y="41">✓</text>
-      </g>
-      <g class="verdict v-bad" style="--i:2">
-        <rect x="400" y="18" width="190" height="34" rx="17" />
-        <text x="423" y="40">is this what we agreed?</text>
-        <text class="mark bad" x="568" y="41">✗</text>
-      </g>
-    </g>
 
-    <!-- the callout -->
-    <g class="drift-tag">
-      <line x1="470" y1="124" x2="470" y2="187" />
-      <text x="482" y="160">drift</text>
-    </g>
-  </svg>
+      <!-- the callout -->
+      <g class="drift-tag">
+        <line x1="470" y1="130" x2="470" y2="192" />
+        <rect x="480" y="148" width="62" height="24" rx="3" />
+        <text x="511" y="165" text-anchor="middle">DRIFT</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Below 860px the same chart is redrawn portrait: time runs down instead of
+       across, so it fits a phone at full label size. -->
+  <div class="drift__portrait">
+    <svg viewBox="0 0 320 470" role="img" aria-labelledby="drift-mt">
+      <title id="drift-mt">Architectural drift over six weeks</title>
+
+      <defs>
+        <pattern id="hatch-v" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="7" stroke="var(--red)" stroke-width="3" opacity="0.32" />
+        </pattern>
+      </defs>
+
+      <text class="m-head" x="10" y="16">what we agreed</text>
+      <text class="m-sub" x="10" y="31">001-boundaries.yaml</text>
+
+      <!-- the gap between the two tracks -->
+      <path class="m-gap" d="M70 44 V430 H236 C150 150 70 92 70 44 Z" fill="url(#hatch-v)" />
+
+      <!-- agreed: a straight track that does not move -->
+      <line class="m-agreed" x1="70" y1="44" x2="70" y2="430" />
+
+      <!-- code: pulls away to the right -->
+      <path class="m-code" d="M70 44 C70 92 150 150 236 430" fill="none" />
+
+      {[[84, 85], [121, 150], [174, 258], [210, 352]].map(([cx, cy], i) => (
+        <rect class="m-commit" x={cx - 5} y={cy - 5} width="10" height="10" style={`--i:${i}`} />
+      ))}
+      <rect class="m-head-sq" x="230" y="424" width="12" height="12" />
+
+      <!-- time runs down the left edge -->
+      {[[44, 'day one'], [172, 'week two'], [300, 'week four'], [428, 'week six']].map(([y, label]) => (
+        <g class="m-tick">
+          <line x1="58" y1={y} x2="70" y2={y} />
+          <text x="54" y={(y as number) + 4} text-anchor="end">{label}</text>
+        </g>
+      ))}
+
+      <g class="m-drift">
+        <rect x="88" y="240" width="62" height="24" rx="3" />
+        <text x="119" y="257" text-anchor="middle">DRIFT</text>
+      </g>
+
+      <text class="m-code-label" x="310" y="452" text-anchor="end">what the code does</text>
+    </svg>
+
+    <ul class="m-verdicts">
+      <li><span>compiler</span><b class="ok">✓</b></li>
+      <li><span>test suite</span><b class="ok">✓</b></li>
+      <li class="is-bad"><span>is this what we agreed?</span><b class="bad">✗</b></li>
+    </ul>
+  </div>
 
   <figcaption>
     Every commit on that curve compiled, passed review and passed CI. Drift is, by
@@ -118,37 +167,41 @@
   .drift {
     margin: 0;
   }
-
+  .drift__scroll {
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop);
+    padding: 1.25rem 1rem;
+  }
   .drift svg {
     width: 100%;
     height: auto;
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
     overflow: visible;
   }
 
   .axis {
-    stroke: var(--line);
-    stroke-width: 1;
+    stroke: var(--ink);
+    stroke-width: 2;
   }
   .tick line {
-    stroke: var(--line-strong);
-    stroke-width: 1;
+    stroke: var(--ink);
+    stroke-width: 2;
   }
   .tick text {
-    font-family: var(--font-mono);
     font-size: 11px;
-    fill: var(--fg-faint);
-    letter-spacing: 0.04em;
+    fill: var(--ink-faint);
   }
 
   /* --- the agreed line: drawn first, then holds ------------------------- */
   .agreed {
-    stroke: var(--amber);
-    stroke-width: 2;
-    stroke-dasharray: 7 6;
+    stroke: var(--ink);
+    stroke-width: 2.5;
+    stroke-dasharray: 8 6;
     stroke-dashoffset: 660;
     animation: draw-agreed 0.9s var(--ease-io) forwards;
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
   @keyframes draw-agreed {
     to {
@@ -157,20 +210,21 @@
   }
 
   .label text {
-    font-size: 14px;
-    font-weight: 550;
-    fill: var(--fg);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    fill: var(--ink);
   }
   .label .sub {
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 400;
-    fill: var(--fg-faint);
+    fill: var(--ink-faint);
   }
   .label {
     opacity: 0;
-    animation: fade 0.5s var(--ease) forwards;
-    animation-play-state: var(--run, paused);
+    animation: fade 0.4s var(--ease) forwards;
+    animation-play-state: var(--run, running);
   }
   .label--agreed {
     animation-delay: 0.5s;
@@ -181,12 +235,13 @@
 
   /* --- the code path: drawn slowly, pulling away ------------------------ */
   .code {
-    stroke-width: 2.5;
+    stroke: var(--red);
+    stroke-width: 3;
     stroke-linecap: round;
     stroke-dasharray: 700;
     stroke-dashoffset: 700;
     animation: draw-code 2.2s var(--ease-io) 0.75s forwards;
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
   @keyframes draw-code {
     to {
@@ -195,82 +250,86 @@
   }
 
   .head {
-    fill: var(--fail);
+    fill: var(--red);
+    stroke: var(--ink);
+    stroke-width: 2;
     opacity: 0;
-    animation: pop 0.5s var(--ease) 2.7s forwards;
-    animation-play-state: var(--run, paused);
+    animation: fade 0.3s var(--ease) 2.7s forwards;
+    animation-play-state: var(--run, running);
   }
 
   .commit {
-    fill: var(--bg);
-    stroke: var(--clay);
+    fill: var(--amber);
+    stroke: var(--ink);
     stroke-width: 2;
     opacity: 0;
-    animation: pop 0.45s var(--ease) forwards;
+    animation: fade 0.25s var(--ease) forwards;
     animation-delay: calc(1.1s + var(--i) * 0.42s);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
 
   .gap {
     opacity: 0;
-    animation: fade 0.9s var(--ease) 2.3s forwards;
-    animation-play-state: var(--run, paused);
+    animation: fade 0.8s var(--ease) 2.3s forwards;
+    animation-play-state: var(--run, running);
   }
 
-  /* --- verdict pills ----------------------------------------------------- */
-  .verdict rect {
-    fill: var(--surface);
-    stroke: var(--line);
-    stroke-width: 1;
+  /* --- verdict panels ---------------------------------------------------- */
+  .verdict .vs {
+    fill: var(--ink);
+  }
+  .verdict .vb {
+    fill: var(--win);
+    stroke: var(--ink);
+    stroke-width: 2;
   }
   .verdict text {
-    font-size: 13px;
-    fill: var(--fg-muted);
-    font-weight: 500;
+    font-size: 12.5px;
+    fill: var(--ink);
   }
   .verdict .mark {
+    font-family: var(--font-display);
     font-size: 15px;
     font-weight: 700;
   }
   .verdict .ok {
-    fill: var(--pass);
+    fill: var(--green);
   }
   .verdict .bad {
-    fill: var(--fail);
+    fill: var(--red);
   }
-  .v-bad rect {
-    stroke: color-mix(in oklab, var(--fail) 55%, var(--line));
-    fill: color-mix(in oklab, var(--fail) 9%, var(--surface));
-  }
-  .v-bad text {
-    fill: var(--fg);
+  .verdict--bad .vb {
+    fill: var(--amber);
   }
 
   .verdict {
     opacity: 0;
-    transform: translateY(-8px);
-    animation: rise 0.55s var(--ease) forwards;
+    animation: fade 0.35s var(--ease) forwards;
     animation-delay: calc(3s + var(--i) * 0.22s);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
 
   .drift-tag {
     opacity: 0;
-    animation: fade 0.6s var(--ease) 2.8s forwards;
-    animation-play-state: var(--run, paused);
+    animation: fade 0.5s var(--ease) 2.8s forwards;
+    animation-play-state: var(--run, running);
   }
   .drift-tag line {
-    stroke: var(--fail);
-    stroke-width: 1.5;
+    stroke: var(--ink);
+    stroke-width: 2;
     stroke-dasharray: 4 4;
   }
+  .drift-tag rect {
+    fill: var(--red);
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
   .drift-tag text {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-    fill: var(--fail);
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    fill: var(--field);
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   @keyframes fade {
@@ -278,43 +337,165 @@
       opacity: 1;
     }
   }
-  @keyframes pop {
-    from {
-      opacity: 0;
-      transform: scale(0.3);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  @keyframes rise {
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  .commit,
-  .head {
-    transform-box: fill-box;
-    transform-origin: center;
-  }
 
   figcaption {
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-    color: var(--fg-muted);
-    max-width: 58ch;
-    line-height: 1.7;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    line-height: 1.75;
   }
 
-  @media (max-width: 620px) {
-    .verdict text {
-      font-size: 15px;
+  /* --- portrait variant --------------------------------------------------- */
+  .drift__portrait {
+    display: none;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop);
+    padding: 1.1rem 0.9rem 1.25rem;
+  }
+  .drift__portrait svg {
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+  }
+
+  .m-head {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    fill: var(--ink);
+  }
+  .m-sub {
+    font-size: 9.5px;
+    fill: var(--ink-faint);
+  }
+  .m-code-label {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    fill: var(--ink);
+    opacity: 0;
+    animation: fade 0.4s var(--ease) 2.5s forwards;
+    animation-play-state: var(--run, running);
+  }
+
+  .m-agreed {
+    stroke: var(--ink);
+    stroke-width: 2.5;
+    stroke-dasharray: 8 6;
+    stroke-dashoffset: 400;
+    animation: draw-agreed 0.9s var(--ease-io) forwards;
+    animation-play-state: var(--run, running);
+  }
+  .m-code {
+    stroke: var(--red);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 500;
+    stroke-dashoffset: 500;
+    animation: draw-m-code 2.2s var(--ease-io) 0.75s forwards;
+    animation-play-state: var(--run, running);
+  }
+  @keyframes draw-m-code {
+    to {
+      stroke-dashoffset: 0;
     }
-    .tick text {
-      font-size: 13px;
+  }
+  .m-gap {
+    opacity: 0;
+    animation: fade 0.8s var(--ease) 2.3s forwards;
+    animation-play-state: var(--run, running);
+  }
+  .m-commit {
+    fill: var(--amber);
+    stroke: var(--ink);
+    stroke-width: 2;
+    opacity: 0;
+    animation: fade 0.25s var(--ease) forwards;
+    animation-delay: calc(1.1s + var(--i) * 0.42s);
+    animation-play-state: var(--run, running);
+  }
+  .m-head-sq {
+    fill: var(--red);
+    stroke: var(--ink);
+    stroke-width: 2;
+    opacity: 0;
+    animation: fade 0.3s var(--ease) 2.7s forwards;
+    animation-play-state: var(--run, running);
+  }
+  .m-tick line {
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+  .m-tick text {
+    font-size: 10px;
+    fill: var(--ink-faint);
+  }
+  .m-drift {
+    opacity: 0;
+    animation: fade 0.5s var(--ease) 2.8s forwards;
+    animation-play-state: var(--run, running);
+  }
+  .m-drift rect {
+    fill: var(--red);
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+  .m-drift text {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    fill: var(--field);
+    letter-spacing: 0.08em;
+  }
+
+  .m-verdicts {
+    list-style: none;
+    margin: 1.1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .m-verdicts li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--drop-sm);
+    padding: 0.5rem 0.7rem;
+    font-size: 0.82rem;
+    opacity: 0;
+    animation: fade 0.35s var(--ease) forwards;
+    animation-play-state: var(--run, running);
+  }
+  .m-verdicts li:nth-child(1) { animation-delay: 3s; }
+  .m-verdicts li:nth-child(2) { animation-delay: 3.2s; }
+  .m-verdicts li:nth-child(3) { animation-delay: 3.4s; }
+  .m-verdicts .is-bad {
+    background: var(--amber);
+  }
+  .m-verdicts b {
+    font-family: var(--font-display);
+    font-size: 1rem;
+  }
+  .m-verdicts .ok {
+    color: var(--green);
+  }
+  .m-verdicts .bad {
+    color: var(--red);
+  }
+
+  @media (max-width: 860px) {
+    .drift__scroll {
+      display: none;
+    }
+    .drift__portrait {
+      display: block;
     }
   }
 </style>

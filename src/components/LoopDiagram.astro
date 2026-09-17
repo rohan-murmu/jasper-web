@@ -2,9 +2,9 @@
 /**
  * The cycle is the product: code → init → YAML → brief/MCP → agent → code → check.
  *
- * Edges are drawn once on entry, then a short "comet" dash runs the same path on
- * a loop. Normalising every path with pathLength="100" means one keyframe block
- * drives every edge regardless of its real length.
+ * Drawn as a wiring diagram on graph paper: 2px black routing, flat panels with
+ * a hard offset shadow, and a lit segment that runs each wire on a loop so the
+ * thing reads as flow rather than as a picture of boxes.
  */
 
 type Kind = 'plain' | 'cmd' | 'key' | 'gate'
@@ -16,98 +16,112 @@ interface Node {
   title: string
   sub?: string[]
   kind: Kind
-  mono?: boolean
   delay: number
 }
 
 const nodes: Node[] = [
-  { x: 40, y: 40, w: 190, h: 62, title: 'your codebase', sub: ['Go · TS · Python · Rust'], kind: 'plain', delay: 0 },
-  { x: 330, y: 40, w: 190, h: 62, title: 'jasper init', sub: ['observe — never invent'], kind: 'cmd', mono: true, delay: 0.35 },
-  { x: 620, y: 40, w: 220, h: 62, title: '.jasper/decisions/*.yaml', sub: ['committed to git'], kind: 'key', mono: true, delay: 0.7 },
-  { x: 40, y: 190, w: 190, h: 78, title: 'jasper brief', sub: ['static constraints', 'appended to CLAUDE.md'], kind: 'cmd', mono: true, delay: 1.3 },
-  { x: 330, y: 190, w: 190, h: 78, title: 'MCP pre-flight', sub: ['the agent asks', 'before it writes'], kind: 'cmd', delay: 1.45 },
-  { x: 620, y: 190, w: 220, h: 78, title: 'jasper check', sub: ['the gate —', 'exit 1 on violation'], kind: 'gate', mono: true, delay: 1.6 },
-  { x: 330, y: 350, w: 190, h: 62, title: 'the agent writes code', kind: 'plain', delay: 2.2 },
+  { x: 40, y: 40, w: 190, h: 64, title: 'your codebase', sub: ['Go · TS · Py · Rust'], kind: 'plain', delay: 0 },
+  { x: 330, y: 40, w: 190, h: 64, title: 'jasper init', sub: ['observe, never invent'], kind: 'cmd', delay: 0.35 },
+  { x: 618, y: 40, w: 224, h: 64, title: 'decisions/*.yaml', sub: ['committed to git'], kind: 'key', delay: 0.7 },
+  { x: 40, y: 192, w: 190, h: 82, title: 'jasper brief', sub: ['static constraints', 'into CLAUDE.md'], kind: 'cmd', delay: 1.3 },
+  { x: 330, y: 192, w: 190, h: 82, title: 'MCP pre-flight', sub: ['the agent asks', 'before it writes'], kind: 'cmd', delay: 1.45 },
+  { x: 618, y: 192, w: 224, h: 82, title: 'jasper check', sub: ['the gate —', 'exit 1 on violation'], kind: 'gate', delay: 1.6 },
+  { x: 330, y: 356, w: 190, h: 64, title: 'agent writes code', kind: 'plain', delay: 2.2 },
 ]
 
-/** Orthogonal routing. Sharp corners — this is a wiring diagram, not a bubble chart. */
 const edges = [
-  { d: 'M230 71 H330', delay: 0.2 },
-  { d: 'M520 71 H620', delay: 0.55 },
-  { d: 'M730 102 V190', delay: 0.95 },
-  { d: 'M730 102 V160 H425 V190', delay: 1.05 },
-  { d: 'M730 102 V160 H135 V190', delay: 1.15 },
-  { d: 'M425 268 V350', delay: 1.9 },
-  { d: 'M135 268 V320 H425 V350', delay: 2.0 },
-  { d: 'M730 268 V320 H425 V350', delay: 2.05 },
+  { d: 'M230 72 H330', delay: 0.2 },
+  { d: 'M520 72 H618', delay: 0.55 },
+  { d: 'M730 104 V192', delay: 0.95 },
+  { d: 'M730 104 V156 H425 V192', delay: 1.05 },
+  { d: 'M730 104 V156 H135 V192', delay: 1.15 },
+  { d: 'M425 274 V356', delay: 1.9 },
+  { d: 'M135 274 V322 H425 V356', delay: 2.0 },
+  { d: 'M730 274 V322 H425 V356', delay: 2.05 },
 ]
 
-const returnEdge = { d: 'M425 412 V446 H14 V71 H40', delay: 2.5 }
+const returnEdge = { d: 'M425 420 V452 H16 V72 H40', delay: 2.5 }
+const all = [...edges, returnEdge]
 ---
 
 <figure class="loop" data-anim>
-  <svg viewBox="0 0 880 480" role="img" aria-labelledby="loop-t loop-d">
-    <title id="loop-t">The Jasper loop</title>
-    <desc id="loop-d">
-      Your codebase feeds jasper init, which proposes decisions into
-      .jasper/decisions. Those decisions are consumed three ways — jasper brief,
-      the MCP pre-flight tools, and jasper check — all of which shape what the
-      agent writes, which becomes the codebase again.
-    </desc>
+  <div class="loop__scroll scroll-x">
+    <svg viewBox="0 0 880 490" role="img" aria-labelledby="loop-t loop-d">
+      <title id="loop-t">The Jasper loop</title>
+      <desc id="loop-d">
+        Your codebase feeds jasper init, which proposes decisions into
+        .jasper/decisions. Those decisions are consumed three ways — jasper brief,
+        the MCP pre-flight tools, and jasper check — all of which shape what the
+        agent writes, which becomes the codebase again.
+      </desc>
 
-    <defs>
-      <marker id="tip" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 1.2 L9 5 L0 8.8 z" fill="var(--line-strong)" />
-      </marker>
-    </defs>
+      <defs>
+        <marker id="tip" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0.8 L9.2 5 L0 9.2 z" fill="var(--ink)" />
+        </marker>
+      </defs>
 
-    <!-- edges -->
-    <g class="edges">
+      <g class="edges">
+        {
+          all.map((e, i) => (
+            <>
+              <path
+                class:list={['wire', { 'wire--return': i === edges.length }]}
+                d={e.d}
+                pathLength="100"
+                marker-end="url(#tip)"
+                style={`--delay:${e.delay}s`}
+              />
+              <path class="pulse" d={e.d} pathLength="100" style={`--delay:${e.delay + 0.9}s`} />
+            </>
+          ))
+        }
+      </g>
+
+      <text class="edge-note" x="210" y="474">a new architectural choice — propose_decision, or a human edit</text>
+
       {
-        [...edges, returnEdge].map((e, i) => (
-          <>
-            <path
-              class:list={['wire', { 'wire--return': i === edges.length }]}
-              d={e.d}
-              pathLength="100"
-              marker-end="url(#tip)"
-              style={`--delay:${e.delay}s`}
-            />
-            <path
-              class="comet"
-              d={e.d}
-              pathLength="100"
-              style={`--delay:${e.delay + 0.9}s; --i:${i}`}
-            />
-          </>
+        nodes.map((n) => (
+          <g class:list={['node', `n-${n.kind}`]} style={`--delay:${n.delay}s`}>
+            <rect class="node__shadow" x={n.x + 4} y={n.y + 4} width={n.w} height={n.h} rx="4" />
+            <rect class="node__box" x={n.x} y={n.y} width={n.w} height={n.h} rx="4" />
+            <text
+              class="n-title"
+              x={n.x + n.w / 2}
+              y={n.sub ? n.y + (n.sub.length > 1 ? 28 : 30) : n.y + 38}
+              text-anchor="middle"
+            >
+              {n.title}
+            </text>
+            {n.sub?.map((line, si) => (
+              <text class="n-sub" x={n.x + n.w / 2} y={n.y + (n.sub!.length > 1 ? 48 : 48) + si * 15} text-anchor="middle">
+                {line}
+              </text>
+            ))}
+          </g>
         ))
       }
-    </g>
+    </svg>
+  </div>
 
-    <text class="edge-note" x="200" y="466">a new architectural choice — propose_decision, or a human edit</text>
-
-    <!-- nodes -->
-    {
-      nodes.map((n) => (
-        <g class:list={['node', `n-${n.kind}`]} style={`--delay:${n.delay}s`}>
-          <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="10" />
-          <text
-            class:list={['n-title', { mono: n.mono }]}
-            x={n.x + n.w / 2}
-            y={n.sub ? n.y + (n.sub.length > 1 ? 27 : 28) : n.y + 37}
-            text-anchor="middle"
-          >
-            {n.title}
-          </text>
-          {n.sub?.map((line, si) => (
-            <text class="n-sub" x={n.x + n.w / 2} y={n.y + (n.sub!.length > 1 ? 47 : 46) + si * 14} text-anchor="middle">
-              {line}
-            </text>
-          ))}
-        </g>
-      ))
-    }
-  </svg>
+  <!-- Below 860px the wide wiring diagram becomes a vertical flow. Same seven
+       nodes, same three-way fan, no horizontal scrolling and nothing dropped. -->
+  <ol class="vflow">
+    <li class="vnode" style="--i:0"><b>your codebase</b><span>Go · TS · Py · Rust</span></li>
+    <li class="vlink" style="--i:1"></li>
+    <li class="vnode vnode--field" style="--i:2"><b>jasper init</b><span>observe, never invent</span></li>
+    <li class="vlink" style="--i:3"></li>
+    <li class="vnode vnode--key" style="--i:4"><b>decisions/*.yaml</b><span>committed to git</span></li>
+    <li class="vlink vlink--fan" style="--i:5"><em>consumed three ways</em></li>
+    <li class="vfan" style="--i:6">
+      <span class="vnode vnode--field"><b>jasper brief</b><span>static constraints into CLAUDE.md</span></span>
+      <span class="vnode vnode--field"><b>MCP pre-flight</b><span>the agent asks before it writes</span></span>
+      <span class="vnode vnode--gate"><b>jasper check</b><span>the gate — exit 1 on violation</span></span>
+    </li>
+    <li class="vlink" style="--i:7"></li>
+    <li class="vnode" style="--i:8"><b>agent writes code</b></li>
+    <li class="vlink vlink--back" style="--i:9"><em>↺ a new architectural choice — back to the codebase</em></li>
+  </ol>
 
   <figcaption>
     Four separate commands, none of them a daemon. Jasper is a gate you position,
@@ -119,62 +133,73 @@ const returnEdge = { d: 'M425 412 V446 H14 V71 H40', delay: 2.5 }
   .loop {
     margin: 0;
   }
+  .loop__scroll {
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop);
+    padding: 1.25rem 1rem;
+  }
   .loop svg {
     width: 100%;
     height: auto;
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
+    overflow: visible;
   }
 
   /* --- wires ------------------------------------------------------------- */
   .wire {
     fill: none;
-    stroke: var(--line-strong);
-    stroke-width: 1.5;
+    stroke: var(--ink);
+    stroke-width: 2;
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
-    animation: draw 0.7s var(--ease-io) forwards;
+    animation: draw 0.65s var(--ease-io) forwards;
     animation-delay: var(--delay);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
   .wire--return {
-    stroke-dasharray: 5 4;
+    stroke-dasharray: 6 5;
     stroke-dashoffset: 0;
     opacity: 0;
-    animation: fade-in 0.8s var(--ease) forwards;
+    animation: fade-in 0.7s var(--ease) forwards;
     animation-delay: var(--delay);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
   @keyframes draw {
     to {
       stroke-dashoffset: 0;
     }
   }
+  @keyframes fade-in {
+    to {
+      opacity: 1;
+    }
+  }
 
-  /* A short lit segment runs the wire forever, so the diagram reads as flow
-     rather than as a static picture of boxes. */
-  .comet {
+  /* A lit segment runs each wire forever — the only motion in the diagram. */
+  .pulse {
     fill: none;
-    stroke: var(--amber);
-    stroke-width: 2.25;
-    stroke-linecap: round;
-    stroke-dasharray: 9 91;
+    stroke: var(--title);
+    stroke-width: 5;
+    stroke-linecap: butt;
+    stroke-dasharray: 8 92;
     stroke-dashoffset: 100;
     opacity: 0;
-    filter: drop-shadow(0 0 4px var(--amber));
-    animation: comet 3.4s linear infinite;
+    animation: pulse 3.4s linear infinite;
     animation-delay: var(--delay);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
-  @keyframes comet {
+  @keyframes pulse {
     0% {
       stroke-dashoffset: 100;
       opacity: 0;
     }
     8%,
-    60% {
-      opacity: 0.85;
+    62% {
+      opacity: 1;
     }
-    72%,
+    74%,
     100% {
       stroke-dashoffset: 0;
       opacity: 0;
@@ -184,95 +209,208 @@ const returnEdge = { d: 'M425 412 V446 H14 V71 H40', delay: 2.5 }
   /* --- nodes ------------------------------------------------------------- */
   .node {
     opacity: 0;
-    transform: translateY(10px);
-    animation: rise 0.6s var(--ease) forwards;
+    animation: pop 0.3s var(--ease) forwards;
     animation-delay: var(--delay);
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
-  @keyframes rise {
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translate(0, 6px);
+    }
     to {
       opacity: 1;
       transform: none;
     }
   }
-  @keyframes fade-in {
-    to {
-      opacity: 1;
-    }
-  }
 
-  .node rect {
-    fill: var(--surface);
-    stroke: var(--line);
-    stroke-width: 1.5;
-    transition: stroke 0.3s var(--ease), fill 0.3s var(--ease);
+  .node__shadow {
+    fill: var(--ink);
   }
-  .node:hover rect {
-    stroke: var(--amber-deep);
+  .node__box {
+    fill: var(--win);
+    stroke: var(--ink);
+    stroke-width: 2;
   }
 
   .n-title {
-    font-size: 14px;
-    font-weight: 600;
-    fill: var(--fg);
-  }
-  .n-title.mono {
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-    font-weight: 500;
+    font-family: var(--font-display);
+    font-size: 13.5px;
+    font-weight: 700;
+    fill: var(--ink);
   }
   .n-sub {
-    font-family: var(--font-mono);
     font-size: 10px;
-    fill: var(--fg-faint);
-    letter-spacing: 0.02em;
+    fill: var(--ink-faint);
   }
 
-  .n-key rect {
-    fill: color-mix(in oklab, var(--amber) 11%, var(--surface));
-    stroke: var(--amber);
-  }
-  .n-key .n-title {
+  .n-key .node__box {
     fill: var(--amber);
   }
-  .n-gate rect {
-    fill: color-mix(in oklab, var(--pass) 8%, var(--surface));
-    stroke: color-mix(in oklab, var(--pass) 60%, var(--line));
+  .n-gate .node__box {
+    fill: var(--green);
   }
-  .n-cmd .n-title {
-    fill: var(--fg);
+  .n-gate .n-title {
+    fill: var(--field);
+  }
+  .n-gate .n-sub {
+    fill: rgba(255, 252, 248, 0.85);
+  }
+  .n-cmd .node__box {
+    fill: var(--field);
   }
 
   .edge-note {
-    font-family: var(--font-mono);
     font-size: 10.5px;
-    fill: var(--fg-faint);
+    fill: var(--ink-faint);
     opacity: 0;
     animation: fade-in 0.6s var(--ease) 3s forwards;
-    animation-play-state: var(--run, paused);
+    animation-play-state: var(--run, running);
   }
 
   figcaption {
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-    color: var(--fg-muted);
-    max-width: 58ch;
-    line-height: 1.7;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    line-height: 1.75;
   }
 
-  /* On a phone the diagram scrolls horizontally rather than shrinking to
-     illegibility. */
-  @media (max-width: 720px) {
-    .loop {
-      overflow-x: auto;
-      margin-inline: calc(var(--gutter) * -1);
-      padding-inline: var(--gutter);
+  /* --- vertical variant -------------------------------------------------- */
+  .vflow {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 1.1rem 0.9rem 1.25rem;
+    background: var(--field);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop);
+  }
+
+  .vnode {
+    display: block;
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
+    padding: 0.7rem 0.85rem;
+    text-align: center;
+  }
+  .vnode b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+  .vnode span {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    line-height: 1.45;
+    margin-top: 0.15rem;
+  }
+  .vnode--field {
+    background: var(--field);
+  }
+  .vnode--key {
+    background: var(--amber);
+  }
+  .vnode--key span {
+    color: var(--ink-soft);
+  }
+  .vnode--gate {
+    background: var(--green);
+  }
+  .vnode--gate b {
+    color: var(--field);
+  }
+  .vnode--gate span {
+    color: rgba(255, 252, 248, 0.9);
+  }
+
+  /* The connector: a 2px rule with a solid arrowhead, drawn in CSS. */
+  .vlink {
+    position: relative;
+    height: 2.1rem;
+    display: grid;
+    place-items: center;
+  }
+  .vlink::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 2px;
+    background: var(--ink);
+  }
+  .vlink::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-inline: 5px solid transparent;
+    border-top: 7px solid var(--ink);
+  }
+  .vlink em {
+    position: relative;
+    font-style: normal;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--amber);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 0.1rem 0.45rem;
+  }
+  .vlink--fan {
+    height: 2.7rem;
+  }
+  .vlink--back {
+    height: auto;
+    padding-top: 1.1rem;
+    margin-top: 0.5rem;
+    border-top: 2px dashed var(--ink);
+  }
+  .vlink--back::before,
+  .vlink--back::after {
+    display: none;
+  }
+  .vlink--back em {
+    background: var(--win-2);
+    font-size: 0.7rem;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1.5;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .vfan {
+    display: grid;
+    gap: 0.6rem;
+    padding: 0.7rem;
+    border: 2px dashed var(--ink);
+    border-radius: var(--radius);
+  }
+
+  /* Staggered in, the same way the SVG nodes are. */
+  .vflow > li {
+    opacity: 0;
+    animation: pop 0.34s var(--ease) forwards;
+    animation-delay: calc(var(--i) * 0.1s);
+    animation-play-state: var(--run, running);
+  }
+
+  @media (max-width: 860px) {
+    .loop__scroll {
+      display: none;
     }
-    .loop svg {
-      min-width: 720px;
-    }
-    figcaption {
-      min-width: 0;
+    .vflow {
+      display: grid;
     }
   }
 </style>

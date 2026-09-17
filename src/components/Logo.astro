@@ -23,23 +23,12 @@ const svg = raw
 <Fragment set:html={svg} />
 
 <style is:global>
+  /* The mark ships amber, which is the palette this whole site is built on, so
+     nothing is remapped. It sits in a bordered tile rather than directly on the
+     window surface — otherwise the stone's mid-tones sink into the peach. */
   .logo {
     height: 1em;
     width: auto;
     overflow: visible;
-  }
-
-  /* The mark's shadow facets are near-black, which vanishes on a dark page.
-     Lifting them slightly keeps the stone's depth readable in both themes. */
-  :root[data-theme='dark'] .logo [style*='fill:#2a2a2a'],
-  :root[data-theme='dark'] .logo [fill='#292929'],
-  :root:not([data-theme='light']) .logo [style*='fill:#2a2a2a'],
-  :root:not([data-theme='light']) .logo [fill='#292929'] {
-    fill: #4a403a;
-  }
-
-  :root[data-theme='dark'] .logo [style*='fill:#3c3b3b'],
-  :root:not([data-theme='light']) .logo [style*='fill:#3c3b3b'] {
-    fill: #5d5049;
   }
 </style>

@@ -158,111 +158,114 @@ const editUrl = `${site.repo}/blob/main/docs/${doc.id}.md`
       margin-inline: auto;
       padding-inline: var(--gutter);
       display: grid;
-      grid-template-columns: 220px minmax(0, 1fr) 210px;
-      gap: clamp(1.5rem, 3.5vw, 3rem);
+      grid-template-columns: 232px minmax(0, 1fr) 210px;
+      gap: clamp(1.5rem, 3vw, 2.75rem);
       align-items: start;
     }
 
     /* ---------- sidebar ---------- */
     .side {
       position: sticky;
-      top: 5.5rem;
-      max-height: calc(100vh - 7rem);
+      top: 6rem;
+      max-height: calc(100vh - 7.5rem);
       overflow-y: auto;
-      padding-block: 2.5rem 2rem;
+      padding-block: 2.25rem 2rem;
       scrollbar-width: thin;
+    }
+    .side nav {
+      background: var(--win);
+      border: var(--edge) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--drop-sm);
+      padding: 0.9rem 0.85rem 1rem;
     }
     .side__head {
       display: block;
-      font-family: var(--font-mono);
-      font-size: 0.64rem;
-      letter-spacing: 0.15em;
+      font-family: var(--font-display);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 0.7rem;
+      color: var(--ink-faint);
+      margin-bottom: 0.65rem;
+      padding-bottom: 0.5rem;
+      border-bottom: var(--edge) solid var(--ink);
     }
     .side__head--gap {
-      margin-top: 1.9rem;
+      margin-top: 1.5rem;
     }
     .side ul {
       list-style: none;
       margin: 0;
       padding: 0;
       display: grid;
-      gap: 0.1rem;
+      gap: 0.12rem;
     }
     .side a {
       display: flex;
       align-items: baseline;
-      gap: 0.55rem;
-      padding: 0.4rem 0.6rem;
-      border-radius: 7px;
-      font-size: 0.875rem;
-      color: var(--fg-muted);
-      border-left: 2px solid transparent;
-      transition: color 0.2s var(--ease), background 0.2s var(--ease),
-        border-color 0.2s var(--ease);
+      gap: 0.5rem;
+      padding: 0.35rem 0.55rem;
+      border: var(--edge) solid transparent;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      color: var(--ink-soft);
     }
     .side a:hover {
-      color: var(--fg);
-      background: var(--surface);
+      background: var(--win-2);
+      border-color: var(--ink);
+      color: var(--ink);
     }
     .side a.is-current {
-      color: var(--amber);
-      background: color-mix(in oklab, var(--amber) 8%, transparent);
-      border-left-color: var(--amber);
-      font-weight: 550;
+      background: var(--title);
+      color: var(--title-ink);
+      border-color: var(--ink);
+      font-weight: 700;
     }
     .side__n {
       font-family: var(--font-mono);
-      font-size: 0.64rem;
-      color: var(--fg-faint);
-    }
-    .side a.is-current .side__n {
-      color: var(--amber-deep);
+      font-size: 0.62rem;
+      opacity: 0.7;
     }
 
     /* ---------- article ---------- */
     .doc {
-      padding-block: 2.5rem 4rem;
+      padding-block: 2.25rem 4rem;
       min-width: 0;
     }
 
     .doc__head {
-      padding-bottom: 1.75rem;
+      padding-bottom: 1.6rem;
       margin-bottom: 2rem;
-      border-bottom: 1px solid var(--line);
+      border-bottom: var(--edge) solid var(--ink);
     }
     .crumbs {
       display: flex;
       align-items: center;
       gap: 0.45rem;
-      font-size: 0.78rem;
-      color: var(--fg-faint);
-      margin-bottom: 0.9rem;
-    }
-    .crumbs a {
-      color: var(--fg-muted);
-      transition: color 0.2s var(--ease);
+      font-size: 0.75rem;
+      color: var(--ink-faint);
+      margin-bottom: 1rem;
     }
     .crumbs a:hover {
-      color: var(--amber);
+      color: var(--title);
     }
     .doc__head h1 {
       font-family: var(--font-display);
-      font-weight: 400;
-      font-size: clamp(2.1rem, 4.6vw, 3rem);
-      line-height: 1.08;
+      font-weight: 700;
+      font-size: clamp(1.75rem, 4.2vw, 2.5rem);
+      line-height: 1.16;
+      letter-spacing: -0.03em;
     }
     .doc__sum {
-      margin-top: 0.8rem;
-      font-size: 1.02rem;
-      color: var(--fg-muted);
-      max-width: 62ch;
-      line-height: 1.65;
+      margin-top: 0.85rem;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      max-width: 64ch;
+      line-height: 1.7;
     }
 
-    /* The first h2 sits right under the header rule, so it does not need its own. */
+    /* The first h2 sits right under the header rule, so it needs no own. */
     .doc :global(.prose > h2:first-child) {
       margin-top: 0;
       padding-top: 0;
@@ -273,124 +276,130 @@ const editUrl = `${site.repo}/blob/main/docs/${doc.id}.md`
     .pager {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.9rem;
-      margin-top: 4rem;
+      gap: 1rem;
+      margin-top: 3.5rem;
       padding-top: 2rem;
-      border-top: 1px solid var(--line);
+      border-top: var(--edge) solid var(--ink);
     }
     .pager__link {
       display: grid;
-      gap: 0.2rem;
-      padding: 1rem 1.15rem;
-      border: 1px solid var(--line);
+      gap: 0.25rem;
+      padding: 0.95rem 1.1rem;
+      border: var(--edge) solid var(--ink);
       border-radius: var(--radius);
-      background: var(--surface);
-      transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+      background: var(--win);
+      box-shadow: var(--drop-sm);
+      transition: transform 0.1s linear, box-shadow 0.1s linear, background 0.15s var(--ease);
     }
     .pager__link:hover {
-      border-color: var(--amber-deep);
-      transform: translateY(-2px);
+      background: var(--amber);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--drop);
     }
     .pager__link--next {
       text-align: right;
       grid-column: 2;
     }
     .pager__link span {
-      font-family: var(--font-mono);
-      font-size: 0.64rem;
-      letter-spacing: 0.14em;
+      font-family: var(--font-display);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--fg-faint);
+      color: var(--ink-faint);
     }
     .pager__link strong {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--fg);
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ink);
     }
 
     /* ---------- on this page ---------- */
     .toc {
       position: sticky;
-      top: 5.5rem;
-      max-height: calc(100vh - 7rem);
+      top: 6rem;
+      max-height: calc(100vh - 7.5rem);
       overflow-y: auto;
-      padding-block: 2.5rem 2rem;
+      padding-block: 2.25rem 2rem;
       scrollbar-width: thin;
     }
     .toc__head {
       display: block;
-      font-family: var(--font-mono);
-      font-size: 0.64rem;
-      letter-spacing: 0.15em;
+      font-family: var(--font-display);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 0.7rem;
+      color: var(--ink-faint);
+      margin-bottom: 0.65rem;
     }
     .toc ul {
       list-style: none;
       margin: 0;
       padding: 0;
-      border-left: 1px solid var(--line);
+      border-left: var(--edge) solid var(--ink);
     }
     .toc li a {
       display: block;
-      padding: 0.3rem 0 0.3rem 0.8rem;
-      margin-left: -1px;
-      border-left: 1px solid transparent;
-      font-size: 0.8rem;
+      padding: 0.28rem 0 0.28rem 0.75rem;
+      margin-left: calc(var(--edge) * -1);
+      border-left: var(--edge) solid transparent;
+      font-size: 0.78rem;
       line-height: 1.45;
-      color: var(--fg-faint);
-      transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+      color: var(--ink-faint);
     }
     .toc li.d-3 a {
-      padding-left: 1.5rem;
-      font-size: 0.775rem;
+      padding-left: 1.45rem;
+      font-size: 0.75rem;
     }
     .toc li a:hover {
-      color: var(--fg-muted);
+      color: var(--ink);
     }
     .toc li a.is-active {
-      color: var(--amber);
-      border-left-color: var(--amber);
+      color: var(--ink);
+      font-weight: 700;
+      border-left-color: var(--title);
     }
     .toc__edit {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      margin-top: 1.5rem;
-      font-size: 0.78rem;
-      color: var(--fg-faint);
-      transition: color 0.2s var(--ease);
+      margin-top: 1.4rem;
+      font-size: 0.75rem;
+      color: var(--ink-faint);
     }
     .toc__edit:hover {
-      color: var(--amber);
+      color: var(--title);
     }
 
     /* ---------- responsive ---------- */
     @media (max-width: 1180px) {
       .docs {
-        grid-template-columns: 200px minmax(0, 1fr);
+        grid-template-columns: 210px minmax(0, 1fr);
       }
       .toc {
         display: none;
       }
     }
 
-    @media (max-width: 860px) {
+    @media (max-width: 900px) {
       .docs {
         grid-template-columns: 1fr;
       }
       .side {
         position: static;
         max-height: none;
-        padding-block: 1.75rem 0;
-        border-bottom: 1px solid var(--line);
+        padding-block: 1.5rem 0;
+      }
+      .side nav {
+        padding: 0.75rem;
       }
       .side ul {
         grid-auto-flow: column;
         grid-auto-columns: max-content;
         overflow-x: auto;
-        padding-bottom: 0.75rem;
+        padding-bottom: 0.35rem;
       }
       .side__head--gap,
       .side ul:last-of-type {

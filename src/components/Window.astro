@@ -1,0 +1,68 @@
+---
+/**
+ * The site's one structural primitive: a window with a title bar.
+ *
+ * Everything that would ordinarily be a "card" is one of these, which is what
+ * makes the page read as a desktop rather than as a modern landing page with a
+ * retro skin painted on.
+ */
+interface Props {
+  title?: string
+  /** Title-bar tint. Orange is the focused window; sand is a background one. */
+  tone?: 'orange' | 'sand' | 'purple' | 'red'
+  /** Drop the offset shadow — for windows sitting inside another panel. */
+  flush?: boolean
+  lg?: boolean
+  /** Removes the body padding, for terminals and diagrams that manage their own. */
+  bare?: boolean
+  class?: string
+  bodyClass?: string
+}
+
+const {
+  title,
+  tone = 'orange',
+  flush = false,
+  lg = false,
+  bare = false,
+  class: klass = '',
+  bodyClass = '',
+} = Astro.props
+---
+
+<div
+  class:list={['win', `win--${tone}`, { 'win--flush': flush, 'win--lg': lg }, klass]}
+  {...Astro.props.id ? { id: Astro.props.id } : {}}
+>
+  {
+    title && (
+      <div class="win__bar">
+        <span class="win__title">{title}</span>
+        <span class="win__ctl" aria-hidden="true">
+          <i /><i /><i />
+        </span>
+      </div>
+    )
+  }
+  <div class:list={['win__body', { 'win__body--bare': bare }, bodyClass]}>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .win--sand .win__bar {
+    background: var(--amber);
+    color: var(--ink);
+  }
+  .win--purple .win__bar {
+    background: var(--purple);
+    color: var(--field);
+  }
+  .win--red .win__bar {
+    background: var(--red);
+    color: var(--field);
+  }
+  .win__body--bare {
+    padding: 0;
+  }
+</style>

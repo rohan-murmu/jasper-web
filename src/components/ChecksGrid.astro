@@ -69,28 +69,30 @@ let n = 0
 <style>
   .checks {
     display: grid;
-    gap: 2.75rem;
+    gap: clamp(2.25rem, 4vw, 3rem);
   }
 
   .group__head {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.9rem;
     flex-wrap: wrap;
-    padding-bottom: 0.85rem;
-    margin-bottom: 1.1rem;
-    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.25rem;
+    border-bottom: var(--edge) solid var(--ink);
   }
   .group__head h3 {
     font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 1.4rem;
-    color: var(--fg);
+    font-weight: 700;
+    font-size: 1.1rem;
   }
   .group__head span {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--fg-faint);
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+    background: var(--win-2);
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 0.1rem 0.5rem;
   }
 
   .group__list {
@@ -98,65 +100,52 @@ let n = 0
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
   }
 
   .chk {
     position: relative;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 1rem 1.05rem;
-    overflow: hidden;
-    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease),
-      background 0.3s var(--ease);
-  }
-
-  /* A warm sweep that only runs on hover — motion as feedback, not decoration. */
-  .chk::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(115deg, transparent 30%, var(--glow) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform 0.7s var(--ease);
+    background: var(--win);
+    border: var(--edge) solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--drop-sm);
+    padding: 1rem 1.1rem;
+    transition: transform 0.1s linear, box-shadow 0.1s linear, background 0.15s var(--ease);
   }
   .chk:hover {
-    border-color: var(--amber-deep);
-    transform: translateY(-2px);
-  }
-  .chk:hover::before {
-    transform: translateX(100%);
+    background: var(--amber);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--drop);
   }
 
   .chk__name {
-    position: relative;
     font-family: var(--font-mono);
-    font-size: 0.83rem;
-    font-weight: 600;
-    color: var(--amber);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--field);
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    padding: 0.05rem 0.35rem;
   }
   .chk__catches {
-    position: relative;
-    margin-top: 0.45rem;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--fg-muted);
-    max-width: 34ch;
+    margin-top: 0.7rem;
+    font-size: 0.84rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .chk:hover .chk__catches {
+    color: var(--ink);
   }
   .chk__arrow {
     position: absolute;
-    top: 0.95rem;
+    top: 1rem;
     right: 1rem;
-    color: var(--fg-faint);
     opacity: 0;
-    transform: translateX(-5px);
-    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), color 0.3s var(--ease);
+    transition: opacity 0.15s var(--ease);
   }
   .chk:hover .chk__arrow {
     opacity: 1;
-    transform: none;
-    color: var(--amber);
   }
 </style>

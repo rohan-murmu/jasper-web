@@ -60,12 +60,30 @@ nav, the reading-order lists and the prev/next pager all read from there.
 
 ## Design
 
-The palette is sampled from the Jasper logo: warm amber (`#f1c07d`, `#cb8242`)
-on a near-black that is tinted brown rather than blue. Tokens live at the top of
-`src/styles/global.css`; light mode redefines the same tokens under
-`:root[data-theme='light']`, and the toggle writes to `localStorage`.
+An old-desktop GUI. A tan desktop, peach windows, a vivid orange title bar, and a
+hard 2px black outline on everything — shadows are a solid offset, never a blur,
+and there are no gradients anywhere.
 
-Type is Instrument Serif for display, Inter for UI, JetBrains Mono for code.
+The palette is the logo's own amber family, so the mark belongs to the page
+rather than sitting on top of it. It is always placed on a bordered white tile
+(`.brand__tile`), never directly on a window surface, where its mid-tones would
+sink into the peach.
+
+Tokens live at the top of `src/styles/global.css`. The site is single-theme: a
+retro desktop in dark mode is a contradiction, so the theme toggle was dropped.
+
+Type is monospaced throughout — Space Mono for window titles and headings,
+JetBrains Mono for body and code.
+
+`src/components/Window.astro` is the one structural primitive. Everything that
+would ordinarily be a "card" is a window with a title bar and a decorative
+`_ □ ×` cluster, which is what makes the page read as a desktop instead of a
+modern layout with a retro skin painted on.
+
+Contrast is checked rather than assumed: every foreground/background pair in the
+palette clears WCAG AA (4.5:1). That is why title bars use near-black text on the
+orange rather than white — white on `#e8621c` is only 3.3:1, near-black is 5.4:1,
+and the orange stays exactly as loud.
 
 ### Animation
 
@@ -82,7 +100,15 @@ sees a diagram from its first frame:
   than hiding it
 
 Diagrams live in `src/components/`: `DriftDiagram`, `LoopDiagram`,
-`ArchDiamond`, `PreflightSequence`, `DecisionAnatomy` and `Terminal`.
+`ArchDiamond`, `PreflightSequence`, `DecisionAnatomy`, `Stats` and `Terminal`.
+
+### Responsiveness
+
+Wide technical diagrams scroll rather than shrink to illegibility — each sits in
+a `.scroll-x` container and takes a `min-width` only below its breakpoint, so the
+labels stay readable on a phone. Nothing else is allowed to scroll the page:
+`body` is `overflow-x: clip`, and long content (terminals, tables, fenced code)
+scrolls inside its own box.
 
 ## Deploying
 
