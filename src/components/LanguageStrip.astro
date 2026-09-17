@@ -1,0 +1,149 @@
+---
+const langs = [
+  {
+    name: 'Go',
+    ext: '.go',
+    how: 'go/parser — the standard library, exact',
+    manifest: 'go.mod',
+    resolve: 'module path → package directory',
+    exact: true,
+  },
+  {
+    name: 'TypeScript / JS',
+    ext: '.ts .tsx .js .mjs …',
+    how: 'hand-written tokenizer',
+    manifest: 'package.json',
+    resolve: 'relative paths + tsconfig aliases',
+    exact: false,
+  },
+  {
+    name: 'Python',
+    ext: '.py .pyi',
+    how: 'comment blanking + statement match',
+    manifest: 'requirements.txt · pyproject · Pipfile',
+    resolve: 'dotted paths, relative imports, src/ layout',
+    exact: false,
+  },
+  {
+    name: 'Rust',
+    ext: '.rs',
+    how: 'comment blanking + use match',
+    manifest: 'Cargo.toml',
+    resolve: 'crate:: / self:: / super::, longest prefix',
+    exact: false,
+  },
+]
+---
+
+<ul class="langs">
+  {
+    langs.map((l, i) => (
+      <li class="lang" data-reveal style={`--delay:${i * 70}ms`}>
+        <div class="lang__top">
+          <h3>{l.name}</h3>
+          <code>{l.ext}</code>
+        </div>
+        <dl>
+          <div>
+            <dt>imports via</dt>
+            <dd>
+              {l.how}
+              {l.exact && <span class="pill">exact</span>}
+            </dd>
+          </div>
+          <div>
+            <dt>manifest</dt>
+            <dd>
+              <code>{l.manifest}</code>
+            </dd>
+          </div>
+          <div>
+            <dt>resolution</dt>
+            <dd>{l.resolve}</dd>
+          </div>
+        </dl>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .langs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.9rem;
+  }
+
+  .lang {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.15rem 1.2rem;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .lang:hover {
+    border-color: var(--amber-deep);
+    transform: translateY(-3px);
+  }
+
+  .lang__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .lang__top h3 {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .lang__top code {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--fg-faint);
+  }
+
+  dl {
+    margin: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+  dt {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+  dd {
+    margin: 0.2rem 0 0;
+    font-size: 0.83rem;
+    line-height: 1.55;
+    color: var(--fg-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+  dd code {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    color: var(--clay);
+  }
+
+  .pill {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pass);
+    border: 1px solid color-mix(in oklab, var(--pass) 45%, transparent);
+    border-radius: 3px;
+    padding: 0.1rem 0.3rem;
+  }
+</style>

@@ -1,0 +1,269 @@
+---
+/**
+ * One decision file, three audiences. The highlight cycles on a 9s loop so the
+ * relationship between the legend and the YAML is shown rather than described;
+ * hovering a legend entry pins its region.
+ */
+
+const parts = [
+  {
+    key: 'why',
+    field: 'why',
+    audience: 'the human reading it in six months',
+    body: 'Rationale, the alternatives that lost, and the failure this prevents. Nothing here executes.',
+  },
+  {
+    key: 'brief',
+    field: 'brief',
+    audience: 'the coding agent, before it starts',
+    body: 'About sixty tokens of constraint — small enough to sit in every prompt without crowding the task out.',
+  },
+  {
+    key: 'enforce',
+    field: 'enforce',
+    audience: 'CI, and the agent’s pre-flight',
+    body: 'Checks that exit non-zero. A decision with no enforce block is a note, not a rule, and Jasper renders it as one.',
+  },
+]
+---
+
+<div class="anatomy" data-anim>
+  <ul class="legend">
+    {
+      parts.map((p, i) => (
+        <li class:list={['lg', `lg--${p.key}`]} style={`--i:${i}`}>
+          <span class="lg__field">{p.field}</span>
+          <span class="lg__aud">{p.audience}</span>
+          <p class="lg__body">{p.body}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="file">
+    <div class="file__bar">
+      <span class="file__path">.jasper/decisions/002-datastore.yaml</span>
+    </div>
+    <pre class="file__code"><code><span class="c-k">id</span>: <span class="c-v">DEC-002</span>
+<span class="c-k">title</span>: <span class="c-v">Datastore is PostgreSQL</span>
+<span class="c-k">status</span>: <span class="c-v">accepted</span>          <span class="c-c"># accepted | proposed | superseded</span>
+<span class="c-k">origin</span>: <span class="c-v">observed</span>          <span class="c-c"># observed | proposed | authored</span>
+<span class="c-k">date</span>: <span class="c-v">2026-09-16</span>
+<span class="rg rg--why"><span class="c-k">why</span>: |
+  Billing needs transactions across rows. A second datastore arriving
+  quietly splits transactions, backups and on-call knowledge before
+  anyone reviews it.</span>
+<span class="rg rg--brief"><span class="c-k">brief</span>: |
+  Persistence is PostgreSQL. The pg driver stays behind src/db/**.
+  Another datastore requires superseding this decision.</span>
+<span class="rg rg--enforce"><span class="c-k">enforce</span>:
+  - <span class="c-k">forbid_dependency</span>:
+      <span class="c-k">packages</span>: [<span class="c-v">mongodb</span>, <span class="c-v">mongoose</span>, <span class="c-v">mysql2</span>]
+      <span class="c-k">message</span>: <span class="c-s">"this project stores data in PostgreSQL"</span>
+  - <span class="c-k">confine</span>:
+      <span class="c-k">package</span>: <span class="c-v">pg</span>
+      <span class="c-k">to</span>: <span class="c-s">"src/db/**"</span></span>
+
+<span class="c-k">affects</span>: [<span class="c-v">billing</span>, <span class="c-v">db</span>]</code></pre>
+  </div>
+</div>
+
+<style>
+  .anatomy {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(1.5rem, 3vw, 2.75rem);
+    align-items: start;
+  }
+
+  /* --- legend ------------------------------------------------------------ */
+  .legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+    position: sticky;
+    top: 6rem;
+  }
+
+  .lg {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 0.85rem 1rem;
+    background: var(--surface);
+    cursor: default;
+    animation: lg-cycle 9s steps(1, end) infinite;
+    animation-delay: calc(var(--i) * -3s);
+    animation-play-state: var(--run, paused);
+    transition: transform 0.3s var(--ease);
+  }
+
+  @keyframes lg-cycle {
+    0% {
+      border-left-color: var(--amber);
+      background: color-mix(in oklab, var(--amber) 8%, var(--surface));
+    }
+    33.33% {
+      border-left-color: var(--line);
+      background: var(--surface);
+    }
+    100% {
+      border-left-color: var(--line);
+      background: var(--surface);
+    }
+  }
+
+  .lg__field {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--amber);
+  }
+  .lg__aud {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--fg-faint);
+    margin-top: 0.1rem;
+  }
+  .lg__body {
+    margin-top: 0.55rem;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--fg-muted);
+  }
+
+  /* --- file -------------------------------------------------------------- */
+  .file {
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .file__bar {
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .file__path {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--fg-faint);
+  }
+  .file__code {
+    margin: 0;
+    padding: 1rem 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.69rem, 1.35vw, 0.78rem);
+    line-height: 1.7;
+    overflow-x: auto;
+    color: var(--fg-muted);
+  }
+  .file__code code {
+    display: block;
+    padding-inline: 1rem;
+    font-size: inherit;
+  }
+
+  .c-k {
+    color: var(--info);
+  }
+  .c-v {
+    color: var(--fg);
+  }
+  .c-s {
+    color: var(--pass);
+  }
+  .c-c {
+    color: var(--fg-faint);
+    font-style: italic;
+  }
+
+  /* --- the cycling highlight -------------------------------------------- */
+  .rg {
+    display: block;
+    margin-inline: -1rem;
+    padding-inline: calc(1rem - 3px);
+    border-left: 3px solid transparent;
+    animation: rg-cycle 9s var(--ease) infinite;
+    animation-play-state: var(--run, paused);
+  }
+  .rg--why {
+    animation-delay: 0s;
+  }
+  .rg--brief {
+    animation-delay: -3s;
+  }
+  .rg--enforce {
+    animation-delay: -6s;
+  }
+
+  @keyframes rg-cycle {
+    0%,
+    28% {
+      background: color-mix(in oklab, var(--amber) 13%, transparent);
+      border-left-color: var(--amber);
+      opacity: 1;
+    }
+    33.33%,
+    95% {
+      background: transparent;
+      border-left-color: transparent;
+      opacity: 0.45;
+    }
+    100% {
+      background: color-mix(in oklab, var(--amber) 13%, transparent);
+      border-left-color: var(--amber);
+      opacity: 1;
+    }
+  }
+
+  /* Hovering a legend entry pins its region and stops the carousel. */
+  .anatomy:has(.lg:hover) .rg,
+  .anatomy:has(.lg:hover) .lg {
+    animation-play-state: paused;
+  }
+  .anatomy:has(.lg--why:hover) .rg--why,
+  .anatomy:has(.lg--brief:hover) .rg--brief,
+  .anatomy:has(.lg--enforce:hover) .rg--enforce {
+    animation: none;
+    background: color-mix(in oklab, var(--amber) 13%, transparent);
+    border-left-color: var(--amber);
+    opacity: 1;
+  }
+  .anatomy:has(.lg--why:hover) .rg--brief,
+  .anatomy:has(.lg--why:hover) .rg--enforce,
+  .anatomy:has(.lg--brief:hover) .rg--why,
+  .anatomy:has(.lg--brief:hover) .rg--enforce,
+  .anatomy:has(.lg--enforce:hover) .rg--why,
+  .anatomy:has(.lg--enforce:hover) .rg--brief {
+    animation: none;
+    background: transparent;
+    border-left-color: transparent;
+    opacity: 0.4;
+  }
+  .lg:hover {
+    transform: translateX(3px);
+    border-left-color: var(--amber);
+    background: color-mix(in oklab, var(--amber) 8%, var(--surface));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rg {
+      opacity: 1 !important;
+      border-left-color: var(--line-strong) !important;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .anatomy {
+      grid-template-columns: 1fr;
+    }
+    .legend {
+      position: static;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,443 @@
+---
+import '../styles/global.css'
+import { site, nav } from '../site'
+import Logo from '../components/Logo.astro'
+import Icon from '../components/Icon.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  /** Docs pages get a wider, sidebar-aware shell and no big footer CTA. */
+  wide?: boolean
+}
+const { title, description = site.description, wide = false } = Astro.props
+
+const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.tagline}`
+const canonical = new URL(Astro.url.pathname, Astro.site)
+const path = Astro.url.pathname
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+
+    <!-- Applied before first paint so a light-mode reader never sees a dark flash. -->
+    <script is:inline>
+      try {
+        const saved = localStorage.getItem('jasper-theme')
+        const theme =
+          saved ??
+          (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        document.documentElement.dataset.theme = theme
+      } catch {
+        document.documentElement.dataset.theme = 'dark'
+      }
+    </script>
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav" id="nav">
+      <div class="nav__inner">
+        <a class="brand" href="/" aria-label="Jasper — home">
+          <Logo class="brand__mark" />
+          <span class="brand__name">Jasper</span>
+        </a>
+
+        <nav class="nav__links" aria-label="Primary">
+          {
+            nav.map((item) => (
+              <a
+                href={item.href}
+                class:list={['nav__link', { 'is-active': item.href === '/docs' && path.startsWith('/docs') }]}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+
+        <div class="nav__actions">
+          <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme">
+            <Icon name="sun" class="icon-sun" />
+            <Icon name="moon" class="icon-moon" />
+          </button>
+          <a class="icon-btn" href={site.repo} target="_blank" rel="noopener" aria-label="Jasper on GitHub">
+            <Icon name="github" />
+          </a>
+          <button class="icon-btn nav__burger" id="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+            <Icon name="menu" />
+          </button>
+        </div>
+      </div>
+
+      <div class="nav__drawer" id="nav-drawer" hidden>
+        {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+        <a href={site.repo} target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </header>
+
+    <main id="main" class:list={{ 'is-wide': wide }}>
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="wrap foot__inner">
+        <div class="foot__brand">
+          <a class="brand" href="/">
+            <Logo class="brand__mark" />
+            <span class="brand__name">Jasper</span>
+          </a>
+          <p>{site.tagline}<br />A single static Go binary. One dependency.</p>
+        </div>
+
+        <div class="foot__cols">
+          <div>
+            <h3>Documentation</h3>
+            <a href="/docs/architecture">Architecture</a>
+            <a href="/docs/workflows">Workflows</a>
+            <a href="/docs/checks">Check reference</a>
+            <a href="/docs/languages">Languages</a>
+          </div>
+          <div>
+            <h3>Integrate</h3>
+            <a href="/docs/mcp">MCP setup</a>
+            <a href="/docs/scaling">Scaling &amp; adoption</a>
+            <a href="/docs/contributing">Contributing</a>
+          </div>
+          <div>
+            <h3>Project</h3>
+            <a href={site.repo} target="_blank" rel="noopener">Source ↗</a>
+            <a href={site.issues} target="_blank" rel="noopener">Issues ↗</a>
+            <a href={site.author.url} target="_blank" rel="noopener">{site.author.name} ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap foot__base">
+        <span>© {new Date().getFullYear()} {site.author.name}</span>
+        <span class="foot__status"><i></i> v1 · early, and honest about it</span>
+      </div>
+    </footer>
+
+    <script is:inline>
+      // --- theme ------------------------------------------------------------
+      const toggle = document.getElementById('theme-toggle')
+      toggle?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'
+        document.documentElement.dataset.theme = next
+        try {
+          localStorage.setItem('jasper-theme', next)
+        } catch {}
+      })
+
+      // --- mobile drawer ----------------------------------------------------
+      const burger = document.getElementById('nav-toggle')
+      const drawer = document.getElementById('nav-drawer')
+      burger?.addEventListener('click', () => {
+        const open = drawer.hasAttribute('hidden')
+        drawer.toggleAttribute('hidden', !open)
+        burger.setAttribute('aria-expanded', String(open))
+      })
+      drawer?.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+          drawer.setAttribute('hidden', '')
+          burger.setAttribute('aria-expanded', 'false')
+        }
+      })
+
+      // --- nav shadow on scroll --------------------------------------------
+      const navEl = document.getElementById('nav')
+      const onScroll = () => navEl?.classList.toggle('is-stuck', window.scrollY > 12)
+      onScroll()
+      addEventListener('scroll', onScroll, { passive: true })
+
+      // --- reveal + diagram playback ---------------------------------------
+      // Diagrams stay paused until they are on screen, so a reader always sees
+      // an animation from frame one rather than halfway through.
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue
+            entry.target.classList.add('is-in')
+            io.unobserve(entry.target)
+          }
+        },
+        { rootMargin: '0px 0px -12% 0px', threshold: 0.15 }
+      )
+      document
+        .querySelectorAll('[data-reveal], [data-anim]')
+        .forEach((el) => io.observe(el))
+
+      // --- copy buttons -----------------------------------------------------
+      document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-copy]')
+        if (!btn) return
+        try {
+          await navigator.clipboard.writeText(btn.dataset.copy)
+          btn.classList.add('is-copied')
+          setTimeout(() => btn.classList.remove('is-copied'), 1600)
+        } catch {}
+      })
+    </script>
+
+    <style is:global>
+      .skip {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        background: var(--amber);
+        color: #17120c;
+        padding: 0.7rem 1.1rem;
+        border-radius: 0 0 8px 0;
+        z-index: 200;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .skip:focus {
+        left: 0;
+      }
+
+      /* --- nav ------------------------------------------------------------ */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(14px) saturate(140%);
+        background: color-mix(in oklab, var(--bg) 82%, transparent);
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+      }
+      .nav.is-stuck {
+        border-bottom-color: var(--line);
+      }
+
+      .nav__inner {
+        max-width: var(--page);
+        margin-inline: auto;
+        padding: 0.85rem var(--gutter);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 1.05rem;
+      }
+      .brand__mark {
+        height: 1.65em;
+        transition: transform 0.45s var(--ease);
+      }
+      .brand:hover .brand__mark {
+        transform: translateY(-2px) rotate(-3deg);
+      }
+      .brand__name {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        letter-spacing: -0.01em;
+      }
+
+      .nav__links {
+        display: flex;
+        gap: 0.35rem;
+        margin-left: auto;
+      }
+      .nav__link {
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        color: var(--fg-muted);
+        transition: color 0.2s var(--ease), background 0.2s var(--ease);
+      }
+      .nav__link:hover,
+      .nav__link.is-active {
+        color: var(--fg);
+        background: var(--surface-2);
+      }
+
+      .nav__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .icon-btn {
+        display: grid;
+        place-items: center;
+        width: 2.15rem;
+        height: 2.15rem;
+        border-radius: 50%;
+        color: var(--fg-muted);
+        border: 1px solid transparent;
+        transition: color 0.2s var(--ease), background 0.2s var(--ease),
+          border-color 0.2s var(--ease);
+      }
+      .icon-btn:hover {
+        color: var(--amber);
+        background: var(--surface-2);
+        border-color: var(--line);
+      }
+      .icon-btn > svg {
+        grid-area: 1 / 1;
+      }
+      :root[data-theme='light'] .icon-sun,
+      :root:not([data-theme='light']) .icon-moon {
+        opacity: 0;
+        transform: scale(0.5) rotate(-40deg);
+      }
+      .icon-sun,
+      .icon-moon {
+        transition: opacity 0.3s var(--ease), transform 0.4s var(--ease);
+      }
+
+      .nav__burger {
+        display: none;
+      }
+
+      .nav__drawer {
+        display: none;
+        flex-direction: column;
+        padding: 0.5rem var(--gutter) 1.1rem;
+        border-top: 1px solid var(--line);
+        background: var(--bg);
+      }
+      .nav__drawer a {
+        padding: 0.7rem 0;
+        color: var(--fg-muted);
+        border-bottom: 1px solid var(--line);
+        font-size: 0.95rem;
+      }
+      .nav__drawer a:last-child {
+        border-bottom: 0;
+      }
+
+      @media (max-width: 860px) {
+        .nav__links {
+          display: none;
+        }
+        .nav__burger {
+          display: grid;
+        }
+        .nav__drawer:not([hidden]) {
+          display: flex;
+        }
+        .nav__actions {
+          margin-left: auto;
+        }
+      }
+
+      /* --- footer --------------------------------------------------------- */
+      .foot {
+        border-top: 1px solid var(--line);
+        background: var(--bg-deep);
+        padding-top: 4rem;
+        margin-top: 2rem;
+      }
+      .foot__inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+        gap: 3rem;
+        padding-bottom: 3rem;
+      }
+      .foot__brand p {
+        margin-top: 1rem;
+        color: var(--fg-faint);
+        font-size: 0.875rem;
+        line-height: 1.7;
+      }
+      .foot__cols {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 2rem;
+      }
+      .foot__cols h3 {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--fg-faint);
+        margin-bottom: 0.9rem;
+        font-weight: 500;
+      }
+      .foot__cols a {
+        display: block;
+        padding: 0.3rem 0;
+        font-size: 0.875rem;
+        color: var(--fg-muted);
+        transition: color 0.2s var(--ease), transform 0.2s var(--ease);
+      }
+      .foot__cols a:hover {
+        color: var(--amber);
+        transform: translateX(3px);
+      }
+      .foot__base {
+        border-top: 1px solid var(--line);
+        padding-block: 1.4rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 0.8rem;
+        color: var(--fg-faint);
+      }
+      .foot__status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+      }
+      .foot__status i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--pass);
+        box-shadow: 0 0 0 0 color-mix(in oklab, var(--pass) 60%, transparent);
+        animation: pulse-dot 2.4s ease-out infinite;
+      }
+      @keyframes pulse-dot {
+        0% {
+          box-shadow: 0 0 0 0 color-mix(in oklab, var(--pass) 55%, transparent);
+        }
+        70%,
+        100% {
+          box-shadow: 0 0 0 7px transparent;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .foot__inner {
+          grid-template-columns: 1fr;
+          gap: 2.25rem;
+        }
+        .foot__cols {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </body>
+</html>

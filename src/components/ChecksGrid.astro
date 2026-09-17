@@ -1,0 +1,162 @@
+---
+/** Ten primitives, grouped by what each one has to read to reach a verdict. */
+
+const groups = [
+  {
+    reads: 'the import graph',
+    note: 'resolved edges between real files',
+    checks: [
+      ['no_import', 'a specific forbidden edge between two globs'],
+      ['layers', 'a whole dependency direction, plus peer isolation, in one rule'],
+      ['public_api', 'anything reaching past a module’s entry point'],
+      ['no_cycles', 'circular dependencies between directories'],
+      ['confine', 'a driver or library escaping the layer that owns it'],
+      ['require_import', 'a file that fails to import something mandatory'],
+    ],
+  },
+  {
+    reads: 'the manifest',
+    note: 'go.mod · package.json · pyproject · Cargo.toml',
+    checks: [
+      ['forbid_dependency', 'a technology choice being quietly reversed'],
+      ['approved_dependencies', 'any package added without a decision'],
+      ['max_dependencies', 'a dependency budget being exceeded'],
+    ],
+  },
+  {
+    reads: 'source text',
+    note: 'loaded lazily, only when a text rule exists',
+    checks: [['forbid_text', 'process.env outside config, debug logging in prod']],
+  },
+]
+
+let n = 0
+---
+
+<div class="checks">
+  {
+    groups.map((g) => (
+      <section class="group">
+        <header class="group__head" data-reveal>
+          <h3>{g.reads}</h3>
+          <span>{g.note}</span>
+        </header>
+        <ul class="group__list">
+          {g.checks.map(([name, catches]) => (
+            <li class="chk" data-reveal style={`--delay:${(n++ % 6) * 60}ms`}>
+              <code class="chk__name">{name}</code>
+              <p class="chk__catches">{catches}</p>
+              <span class="chk__arrow" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="13" height="13">
+                  <path
+                    d="M3 8h10m0 0-3.6-3.6M13 8l-3.6 3.6"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .checks {
+    display: grid;
+    gap: 2.75rem;
+  }
+
+  .group__head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    padding-bottom: 0.85rem;
+    margin-bottom: 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .group__head h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: var(--fg);
+  }
+  .group__head span {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--fg-faint);
+  }
+
+  .group__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .chk {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.05rem;
+    overflow: hidden;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease),
+      background 0.3s var(--ease);
+  }
+
+  /* A warm sweep that only runs on hover — motion as feedback, not decoration. */
+  .chk::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 30%, var(--glow) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.7s var(--ease);
+  }
+  .chk:hover {
+    border-color: var(--amber-deep);
+    transform: translateY(-2px);
+  }
+  .chk:hover::before {
+    transform: translateX(100%);
+  }
+
+  .chk__name {
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--amber);
+  }
+  .chk__catches {
+    position: relative;
+    margin-top: 0.45rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--fg-muted);
+    max-width: 34ch;
+  }
+  .chk__arrow {
+    position: absolute;
+    top: 0.95rem;
+    right: 1rem;
+    color: var(--fg-faint);
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), color 0.3s var(--ease);
+  }
+  .chk:hover .chk__arrow {
+    opacity: 1;
+    transform: none;
+    color: var(--amber);
+  }
+</style>

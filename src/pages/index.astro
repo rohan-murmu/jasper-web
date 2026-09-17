@@ -1,0 +1,1112 @@
+---
+import Base from '../layouts/Base.astro'
+import Icon from '../components/Icon.astro'
+import Terminal from '../components/Terminal.astro'
+import DriftDiagram from '../components/DriftDiagram.astro'
+import LoopDiagram from '../components/LoopDiagram.astro'
+import DecisionAnatomy from '../components/DecisionAnatomy.astro'
+import PreflightSequence from '../components/PreflightSequence.astro'
+import ArchDiamond from '../components/ArchDiamond.astro'
+import ChecksGrid from '../components/ChecksGrid.astro'
+import LanguageStrip from '../components/LanguageStrip.astro'
+import Stats from '../components/Stats.astro'
+import { site } from '../site'
+
+const INSTALL = `git clone ${site.repo} && cd jasper && go install ./cmd/jasper`
+
+const checkOutput = [
+  { tone: 'blank' as const },
+  { text: '✗ DEC-001  Identity internals are private', tone: 'fail' as const },
+  { text: 'src/billing/invoice.ts:3', tone: 'plain' as const, pad: 4 },
+  { text: 'imports "@/identity/internal/session" -> src/identity/internal/session.ts', tone: 'dim' as const, pad: 6 },
+  { text: 'use the identity public API (src/identity/index.ts)', tone: 'dim' as const, pad: 6 },
+  { text: '→ Move the shared code behind a public entry point, or record a', tone: 'amber' as const, pad: 4 },
+  { text: '  decision that permits this edge.', tone: 'amber' as const, pad: 4 },
+  { text: 'why → .jasper/decisions/001-boundaries.yaml', tone: 'dim' as const, pad: 4 },
+  { tone: 'blank' as const },
+  { text: '✗ DEC-002  Datastore is PostgreSQL', tone: 'fail' as const },
+  { text: 'package.json', tone: 'plain' as const, pad: 4 },
+  { text: 'declared dependency mongoose@^8.5.0', tone: 'dim' as const, pad: 6 },
+  { text: 'this project stores data in PostgreSQL', tone: 'dim' as const, pad: 6 },
+  { tone: 'blank' as const },
+  { text: '3 violations · 1 checks passed · 4 files · 5ms', tone: 'plain' as const },
+]
+
+const initOutput = [
+  { tone: 'blank' as const },
+  { text: 'What is true of your code right now', tone: 'plain' as const, pad: 2 },
+  { text: '✓ 5 direct dependencies declared', tone: 'pass' as const, pad: 4 },
+  { text: 'fastapi, httpx, psycopg, requests, sqlalchemy', tone: 'dim' as const, pad: 6 },
+  { text: '✓ Datastore: PostgreSQL', tone: 'pass' as const, pad: 4 },
+  { text: 'no other database driver is declared', tone: 'dim' as const, pad: 6 },
+  { text: '✗ Two Python HTTP clients: httpx and requests', tone: 'fail' as const, pad: 4 },
+  { text: 'probably drift — pick one before enforcing', tone: 'dim' as const, pad: 6 },
+  { tone: 'blank' as const },
+  { text: 'Proposed 2 decisions · 1 fact withheld', tone: 'amber' as const, pad: 2 },
+]
+
+const questions = [
+  { who: 'the compiler', q: 'is this valid?', tone: 'ok' },
+  { who: 'the test suite', q: 'does this work?', tone: 'ok' },
+  { who: 'Jasper', q: 'is this what we agreed?', tone: 'key' },
+]
+
+const tools = [
+  ['architecture_brief', 'before starting work in an unfamiliar area'],
+  ['can_import', 'before writing an import that crosses a boundary'],
+  ['can_add_dependency', 'before adding any package'],
+  ['check_architecture', 'after a batch of edits, before claiming it is done'],
+  ['explain_decision', 'when a denial needs context'],
+  ['list_decisions', 'to see what exists'],
+  ['propose_decision', 'to put an alternative in front of a human'],
+]
+---
+
+<Base>
+  <!-- ==================================================================
+       Hero
+       ================================================================== -->
+  <section class="hero">
+    <div class="hero__ambient" aria-hidden="true"></div>
+
+    <div class="wrap hero__inner">
+      <span class="hero__badge">
+        <i></i> v1 · one static binary · CLI&nbsp;+&nbsp;MCP
+      </span>
+
+      <h1 class="display hero__h1">
+        Your coding agent makes architectural decisions <em>every hour</em>.
+      </h1>
+
+      <p class="lede hero__lede">
+        Jasper records them, and tells the agent — or the build — the moment the
+        code stops honoring them. Not a spec generator. Not a workflow engine. It
+        sits <em>underneath</em> Claude Code, Cursor or Codex and does exactly one
+        thing.
+      </p>
+
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#how">
+          How it works <Icon name="arrow" />
+        </a>
+        <a class="btn btn--ghost" href={site.repo} target="_blank" rel="noopener">
+          <Icon name="github" /> View source
+        </a>
+      </div>
+
+      <button class="install" type="button" data-copy={INSTALL} aria-label="Copy install command">
+        <span class="install__prompt">$</span>
+        <code>git clone …/jasper &amp;&amp; go install ./cmd/jasper</code>
+        <span class="install__icons">
+          <Icon name="copy" size={14} class="c-copy" />
+          <Icon name="check" size={14} class="c-check" />
+        </span>
+      </button>
+      <p class="install__note">
+        Requires Go 1.24+. No CGO, no Node, no Python runtime — one Go dependency.
+      </p>
+    </div>
+
+    <div class="wrap hero__term">
+      <Terminal command="jasper check" lines={checkOutput} title="your-project — zsh" />
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       Three questions
+       ================================================================== -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="qs">
+        {
+          questions.map((q, i) => (
+            <div class:list={['q', `q--${q.tone}`]} data-reveal style={`--delay:${i * 110}ms`}>
+              <span class="q__who">{q.who}</span>
+              <p class="q__q">{q.q}</p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="qs__note" data-reveal style="--delay:380ms">
+        Three tools, three different questions. Only one of them is about the
+        agreement — and it is the only one no compiler can answer for you.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ==================================================================
+       The problem
+       ================================================================== -->
+  <section class="section" id="problem">
+    <div class="wrap">
+      <header class="head" data-reveal>
+        <span class="eyebrow">the problem</span>
+        <h2 class="section-title">
+          A stale architecture doc is <em>worse than none</em>.
+        </h2>
+        <p class="lede">
+          Generating the document is the easy half, and it is already free. The hard
+          half is that six weeks later the code no longer matches it — and agents
+          read documentation as ground truth, then generate code to fit an
+          architecture that no longer exists.
+        </p>
+      </header>
+
+      <div class="problem__body">
+        <div class="problem__snippet" data-reveal>
+          <p>This import type-checks, compiles, runs, and passes every test:</p>
+          <pre class="snippet"><code><span class="kw">import</span> {'{'} getSession {'}'} <span class="kw">from</span> <span class="str">'@/identity/internal/session'</span></code></pre>
+          <p>
+            Nothing is mechanically wrong with it. It is wrong only because
+            <code class="k">identity</code> owns its storage format and
+            <code class="k">billing</code> just took a dependency on it — so in six
+            weeks a local change becomes a breaking one.
+          </p>
+        </div>
+
+        <div class="problem__diagram" data-reveal style="--delay:120ms">
+          <DriftDiagram />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ==================================================================
+       The shape of a decision
+       ================================================================== -->
+  <section class="section" id="decision">
+    <div class="wrap">
+      <header class="head head--center" data-reveal>
+        <span class="eyebrow">the unit</span>
+        <h2 class="section-title">One YAML file. <em>Three audiences.</em></h2>
+        <p class="lede">
+          Decisions live in <code class="k">.jasper/decisions/*.yaml</code>, committed
+          to git — which already provides versioning, diffing, branching and review,
+          so Jasper builds none of those.
+        </p>
+      </header>
+
+      <div data-reveal style="--delay:100ms">
+        <DecisionAnatomy />
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ==================================================================
+       How it works
+       ================================================================== -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <header class="head" data-reveal>
+        <span class="eyebrow">how easy it is</span>
+        <h2 class="section-title">Three commands, and you are <em>already covered</em>.</h2>
+        <p class="lede">
+          No config file to design, no architecture to invent up front, and no wall of
+          failures on day one.
+        </p>
+      </header>
+
+      <ol class="steps">
+        <li class="step" data-reveal>
+          <div class="step__text">
+            <span class="step__n">01</span>
+            <h3>Let it observe</h3>
+            <p>
+              <code class="k">jasper init</code> parses imports, lockfiles and manifests,
+              reports what is <em>actually</em> true, and proposes only rules that pass
+              on your current HEAD. Facts that do not hold are shown and deliberately
+              not offered.
+            </p>
+          </div>
+          <div class="step__demo">
+            <Terminal command="jasper init" lines={initOutput} title="your-project — zsh" type={0.9} />
+          </div>
+        </li>
+
+        <li class="step step--flip" data-reveal>
+          <div class="step__text">
+            <span class="step__n">02</span>
+            <h3>Put the gate where it holds</h3>
+            <p>
+              <code class="k">jasper check</code> exits <code class="k">1</code> on a
+              violation and <code class="k">2</code> if you invoked it wrong — CI cares
+              about that distinction. GitHub annotations land inline on the changed
+              lines of the diff.
+            </p>
+          </div>
+          <div class="step__demo">
+            <div class="snips">
+              <div class="snip">
+                <span class="snip__label">CI</span>
+                <code>jasper check --format github</code>
+              </div>
+              <div class="snip">
+                <span class="snip__label">pre-commit</span>
+                <code>echo 'jasper check' &gt;&gt; .git/hooks/pre-commit</code>
+              </div>
+              <div class="snip">
+                <span class="snip__label">exit codes</span>
+                <code
+                  ><b class="ok">0</b> fine · <b class="bad">1</b> your code is wrong ·
+                  <b class="warn">2</b> you invoked it wrong</code
+                >
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="step" data-reveal>
+          <div class="step__text">
+            <span class="step__n">03</span>
+            <h3>Wire it to the agent</h3>
+            <p>
+              One command adds the MCP server. Or commit a
+              <code class="k">.mcp.json</code> so the whole team gets it. For an agent
+              with no MCP support, <code class="k">jasper brief &gt;&gt; CLAUDE.md</code>
+              still works.
+            </p>
+          </div>
+          <div class="step__demo">
+            <Terminal
+              command="claude mcp add jasper -- jasper mcp"
+              lines={[
+                { tone: 'blank' },
+                { text: '✓ Added MCP server "jasper" (stdio)', tone: 'pass' },
+                { text: '  7 tools registered', tone: 'dim' },
+              ]}
+              title="zsh"
+              type={1.4}
+            />
+          </div>
+        </li>
+      </ol>
+
+      <div class="loop-block" data-reveal>
+        <header class="head head--center">
+          <span class="eyebrow" style="justify-content:center">the loop</span>
+          <h3 class="section-title" style="margin-inline:auto">The cycle <em>is</em> the product.</h3>
+        </header>
+        <LoopDiagram />
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ==================================================================
+       For agents
+       ================================================================== -->
+  <section class="section" id="agent">
+    <div class="wrap">
+      <header class="head" data-reveal>
+        <span class="eyebrow">for coding agents</span>
+        <h2 class="section-title">It answers <em>before</em> the code exists.</h2>
+        <p class="lede">
+          <code class="k">can_import</code> and <code class="k">can_add_dependency</code>
+          take a file that is not on disk yet. A hypothetical is just a second snapshot,
+          which is why the pre-flight pair can exist at all.
+        </p>
+      </header>
+
+      <div class="agent__grid">
+        <div data-reveal>
+          <PreflightSequence />
+        </div>
+
+        <aside class="tools" data-reveal style="--delay:140ms">
+          <h3>Seven tools</h3>
+          <ul>
+            {
+              tools.map(([name, when], i) => (
+                <li style={`--delay:${i * 55}ms`}>
+                  <code>{name}</code>
+                  <span>{when}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="tools__note">
+            <code>propose_decision</code> writes <code>status: proposed</code>, which
+            enforces nothing — an agent can argue for a rule change in git, but cannot
+            approve itself out of a constraint.
+          </p>
+          <a class="btn btn--ghost" href="/docs/mcp">
+            <Icon name="book" /> MCP reference
+          </a>
+        </aside>
+      </div>
+
+      <div class="gate" data-reveal>
+        <div class="gate__half">
+          <span class="gate__tag">advisory</span>
+          <h4>MCP catches it before it is written</h4>
+          <p>An agent can decline to call a tool. Useful, and not a guarantee.</p>
+        </div>
+        <div class="gate__div" aria-hidden="true"></div>
+        <div class="gate__half gate__half--hard">
+          <span class="gate__tag">enforcing</span>
+          <h4>The CLI does not depend on cooperation</h4>
+          <p>Keep a gate in CI regardless. That one holds whether the agent plays along or not.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ==================================================================
+       Checks + languages
+       ================================================================== -->
+  <section class="section" id="checks">
+    <div class="wrap">
+      <header class="head" data-reveal>
+        <span class="eyebrow">the primitives</span>
+        <h2 class="section-title">Ten checks. <em>One file each.</em></h2>
+        <p class="lede">
+          A rule that compiles but enforces nothing is the failure mode this whole
+          project exists to prevent — so every check is small enough to read in full.
+        </p>
+      </header>
+
+      <ChecksGrid />
+
+      <div class="after-checks">
+        <a class="btn btn--ghost" href="/docs/checks">
+          <Icon name="book" /> Every field, with worked examples
+        </a>
+      </div>
+
+      <div class="langs-block">
+        <header class="head" data-reveal>
+          <span class="eyebrow">languages</span>
+          <h3 class="section-title">Four today. Adding one is <em>one package</em>.</h3>
+          <p class="lede">
+            A new language is one new package and one blank import — no existing file
+            changes.
+          </p>
+        </header>
+        <LanguageStrip />
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ==================================================================
+       Architecture
+       ================================================================== -->
+  <section class="section" id="architecture">
+    <div class="wrap">
+      <header class="head head--center" data-reveal>
+        <span class="eyebrow">how it is built</span>
+        <h2 class="section-title">A pure function with a <em>thin impure shell</em>.</h2>
+      </header>
+
+      <div class="equation" data-reveal>
+        <code>(repo bytes, .jasper/ files) <span>→</span> Snapshot <span>→</span> []Finding</code>
+      </div>
+
+      <p class="lede lede--center" data-reveal>
+        <code class="k">scan</code> is the only package that reads source files.
+        Everything above it is a function of the snapshot it produces — which is what
+        lets the identical engine run in a CLI, an MCP server, a CI job and a batch over
+        hundreds of repositories without modification.
+      </p>
+
+      <div class="arch-block" data-reveal style="--delay:120ms">
+        <ArchDiamond />
+      </div>
+
+      <div class="stats-block">
+        <Stats />
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ==================================================================
+       Status
+       ================================================================== -->
+  <section class="section section--tight" id="status">
+    <div class="wrap">
+      <div class="status">
+        <div class="status__col" data-reveal>
+          <span class="eyebrow">status</span>
+          <h2 class="section-title">v1, early, and <em>honest about it</em>.</h2>
+          <p class="lede">
+            Self-enforcing: <code class="k">jasper check</code> on Jasper's own repo
+            passes nine compiled checks. ~5.5k lines of production Go, ~1.5k lines of
+            tests, one dependency.
+          </p>
+        </div>
+
+        <ul class="limits" data-reveal style="--delay:100ms">
+          <li>
+            The import graph is the unit of analysis. Jasper sees
+            <code>require("pg")</code>; it does not see a raw SQL string, a dynamically
+            constructed import, or a shell-out.
+          </li>
+          <li>
+            TypeScript and Python imports come from a tokenizer, not a full parser. The
+            <code>scan.Language</code> seam exists so one language can move to tree-sitter
+            without touching anything else.
+          </li>
+          <li>
+            Rust module resolution uses longest-existing-prefix — right for the common
+            layout, wrong for <code>#[path]</code> attributes.
+          </li>
+          <li>
+            <code>Scope.since</code> (git-rev grandfathering) parses but is not yet
+            applied. The snapshot cache is computed but not yet used.
+          </li>
+          <li>No LSP port, no <code>jasper decide</code> command, no multi-repo batch mode.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       CTA
+       ================================================================== -->
+  <section class="cta">
+    <div class="wrap cta__inner" data-reveal>
+      <h2 class="display cta__h">
+        Record the decision <em>once</em>.<br />Let the build remember it.
+      </h2>
+
+      <button class="install install--lg" type="button" data-copy={INSTALL} aria-label="Copy install command">
+        <span class="install__prompt">$</span>
+        <code>git clone …/jasper &amp;&amp; go install ./cmd/jasper</code>
+        <span class="install__icons">
+          <Icon name="copy" size={14} class="c-copy" />
+          <Icon name="check" size={14} class="c-check" />
+        </span>
+      </button>
+
+      <div class="cta__row">
+        <a class="btn btn--primary" href="/docs">
+          <Icon name="book" /> Read the docs
+        </a>
+        <a class="btn btn--ghost" href={site.repo} target="_blank" rel="noopener">
+          <Icon name="github" /> github.com/rohan-murmu/jasper
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ====================================================================
+     Hero
+     ==================================================================== */
+  .hero {
+    position: relative;
+    padding-top: clamp(3.5rem, 9vw, 7rem);
+    padding-bottom: clamp(3rem, 7vw, 5rem);
+    overflow: hidden;
+  }
+
+  /* Slow warm bloom + a faint technical grid. Both drift, neither distracts. */
+  .hero__ambient {
+    position: absolute;
+    inset: -20% -10% auto;
+    height: 780px;
+    pointer-events: none;
+    background:
+      radial-gradient(48% 50% at 50% 30%, var(--glow), transparent 70%),
+      radial-gradient(30% 35% at 78% 12%, color-mix(in oklab, var(--clay) 12%, transparent), transparent 70%);
+    animation: bloom 16s ease-in-out infinite alternate;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(70% 55% at 50% 22%, #000 0%, transparent 78%);
+    opacity: 0.4;
+  }
+  @keyframes bloom {
+    from {
+      transform: translate3d(-2%, 0, 0) scale(1);
+      opacity: 0.85;
+    }
+    to {
+      transform: translate3d(3%, 2%, 0) scale(1.08);
+      opacity: 1;
+    }
+  }
+
+  .hero__inner {
+    position: relative;
+    max-width: 62rem;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.32rem 0.8rem 0.32rem 0.6rem;
+    animation: fade-up 0.7s var(--ease) both;
+  }
+  .hero__badge i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+  }
+
+  .hero__h1 {
+    font-size: clamp(2.5rem, 6.4vw, 4.7rem);
+    margin-top: 1.5rem;
+    max-width: 17ch;
+    animation: fade-up 0.8s var(--ease) 0.08s both;
+  }
+
+  .hero__lede {
+    animation: fade-up 0.8s var(--ease) 0.18s both;
+  }
+  .hero__lede em {
+    color: var(--fg);
+    font-style: italic;
+  }
+
+  .hero__cta {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    animation: fade-up 0.8s var(--ease) 0.28s both;
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .install {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 0.62rem 0.9rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--fg-muted);
+    max-width: 100%;
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+    animation: fade-up 0.8s var(--ease) 0.36s both;
+  }
+  .install:hover {
+    border-color: var(--amber-deep);
+    color: var(--fg);
+  }
+  .install__prompt {
+    color: var(--amber);
+  }
+  .install code {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .install__icons {
+    display: grid;
+    margin-left: 0.2rem;
+    color: var(--fg-faint);
+  }
+  .install__icons > :global(svg) {
+    grid-area: 1 / 1;
+    transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+  }
+  .install__icons :global(.c-check) {
+    opacity: 0;
+    transform: scale(0.5);
+    color: var(--pass);
+  }
+  .install.is-copied :global(.c-copy) {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  .install.is-copied :global(.c-check) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .install__note {
+    margin-top: 0.7rem;
+    font-size: 0.8rem;
+    color: var(--fg-faint);
+    animation: fade-up 0.8s var(--ease) 0.42s both;
+  }
+
+  .hero__term {
+    position: relative;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    animation: fade-up 0.9s var(--ease) 0.5s both;
+  }
+
+  /* ====================================================================
+     Shared section furniture
+     ==================================================================== */
+  .section--tight {
+    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  }
+
+  .head {
+    margin-bottom: clamp(2.25rem, 4vw, 3.25rem);
+  }
+  .head--center {
+    text-align: center;
+  }
+  .head--center .eyebrow {
+    justify-content: center;
+  }
+  .head--center .section-title {
+    margin-inline: auto;
+  }
+  .head--center .lede {
+    margin-inline: auto;
+  }
+  .lede--center {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  /* ====================================================================
+     Three questions
+     ==================================================================== */
+  .qs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .q {
+    background: var(--surface);
+    padding: 1.6rem 1.5rem;
+  }
+  .q__who {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+  .q__q {
+    margin-top: 0.6rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2.6vw, 1.8rem);
+    line-height: 1.2;
+    color: var(--fg-muted);
+  }
+  .q--key {
+    background: color-mix(in oklab, var(--amber) 9%, var(--surface));
+  }
+  .q--key .q__who {
+    color: var(--amber-deep);
+  }
+  .q--key .q__q {
+    color: var(--amber);
+    font-style: italic;
+  }
+  .qs__note {
+    margin-top: 1.4rem;
+    font-size: 0.92rem;
+    color: var(--fg-muted);
+    max-width: 62ch;
+  }
+
+  /* ====================================================================
+     Problem
+     ==================================================================== */
+  .problem__body {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+  }
+  .problem__snippet {
+    max-width: 62ch;
+    font-size: 0.95rem;
+    color: var(--fg-muted);
+    display: grid;
+    gap: 1rem;
+  }
+  .snippet {
+    margin: 0;
+    padding: 0.95rem 1.1rem;
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--fail);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    overflow-x: auto;
+    color: var(--fg);
+  }
+  .snippet .kw {
+    color: var(--clay);
+  }
+  .snippet .str {
+    color: var(--pass);
+  }
+
+  /* ====================================================================
+     Steps
+     ==================================================================== */
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: clamp(3rem, 6vw, 4.5rem);
+  }
+  .step {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+  .step--flip .step__text {
+    order: 2;
+  }
+  .step__n {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--amber-deep);
+  }
+  .step__text h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-top: 0.5rem;
+  }
+  .step__text p {
+    margin-top: 0.85rem;
+    color: var(--fg-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    max-width: 46ch;
+  }
+  .step__text em {
+    color: var(--fg);
+    font-style: italic;
+  }
+
+  .snips {
+    display: grid;
+    gap: 0.7rem;
+  }
+  .snip {
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+  }
+  .snip__label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    margin-bottom: 0.4rem;
+  }
+  .snip code {
+    font-family: var(--font-mono);
+    font-size: 0.79rem;
+    color: var(--fg);
+    word-break: break-word;
+  }
+  .snip b {
+    font-weight: 700;
+  }
+  .snip .ok {
+    color: var(--pass);
+  }
+  .snip .bad {
+    color: var(--fail);
+  }
+  .snip .warn {
+    color: var(--amber);
+  }
+
+  .loop-block {
+    margin-top: clamp(4rem, 8vw, 6rem);
+  }
+
+  /* ====================================================================
+     Agent
+     ==================================================================== */
+  .agent__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+    gap: clamp(1.75rem, 4vw, 3rem);
+    align-items: start;
+  }
+
+  .tools {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.5rem;
+    position: sticky;
+    top: 6rem;
+  }
+  .tools h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .tools ul {
+    list-style: none;
+    margin: 0 0 1.2rem;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+  .tools li {
+    display: grid;
+    gap: 0.15rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .tools li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .tools li code {
+    font-family: var(--font-mono);
+    font-size: 0.79rem;
+    color: var(--amber);
+  }
+  .tools li span {
+    font-size: 0.8rem;
+    color: var(--fg-faint);
+    line-height: 1.5;
+  }
+  .tools__note {
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: var(--fg-muted);
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    margin-bottom: 1.1rem;
+  }
+  .tools__note code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--clay);
+  }
+
+  .gate {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: stretch;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(1.4rem, 3vw, 2rem);
+  }
+  .gate__div {
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--line-strong), transparent);
+  }
+  .gate__tag {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+  .gate__half--hard .gate__tag {
+    color: var(--pass);
+  }
+  .gate__half h4 {
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .gate__half p {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+    line-height: 1.65;
+  }
+
+  /* ====================================================================
+     Checks / languages
+     ==================================================================== */
+  .after-checks {
+    margin-top: 2rem;
+  }
+  .langs-block {
+    margin-top: clamp(4rem, 8vw, 6rem);
+  }
+
+  /* ====================================================================
+     Architecture
+     ==================================================================== */
+  .equation {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .equation code {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: clamp(0.8rem, 1.9vw, 1.02rem);
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.7rem 1.4rem;
+    color: var(--fg);
+    box-shadow: 0 0 40px -18px var(--amber);
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+  .equation span {
+    color: var(--amber);
+    padding-inline: 0.35rem;
+  }
+
+  .arch-block {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  .stats-block {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  /* ====================================================================
+     Status
+     ==================================================================== */
+  .status {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(1.75rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+  .limits {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .limits li {
+    position: relative;
+    padding-left: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--fg-muted);
+  }
+  .limits li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--line-strong);
+    transform: rotate(45deg);
+  }
+  .limits code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--clay);
+  }
+
+  /* ====================================================================
+     CTA
+     ==================================================================== */
+  .cta {
+    position: relative;
+    padding-block: clamp(5rem, 10vw, 8rem);
+    text-align: center;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+    background:
+      radial-gradient(60% 100% at 50% 100%, var(--glow), transparent 70%),
+      var(--bg-deep);
+  }
+  .cta__h {
+    font-size: clamp(2rem, 5.2vw, 3.6rem);
+    max-width: 22ch;
+    margin-inline: auto;
+  }
+  .cta .install {
+    margin-top: 2rem;
+    animation: none;
+  }
+  .cta__row {
+    display: flex;
+    gap: 0.7rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.6rem;
+  }
+
+  /* ====================================================================
+     Responsive
+     ==================================================================== */
+  @media (max-width: 900px) {
+    .step,
+    .agent__grid,
+    .status {
+      grid-template-columns: 1fr;
+    }
+    .step--flip .step__text {
+      order: 0;
+    }
+    .tools {
+      position: static;
+    }
+    .gate {
+      grid-template-columns: 1fr;
+    }
+    .gate__div {
+      width: auto;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--line-strong), transparent);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .install code {
+      font-size: 0.72rem;
+    }
+  }
+</style>

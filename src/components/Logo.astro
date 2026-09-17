@@ -1,0 +1,45 @@
+---
+/**
+ * The jasper mark, inlined from jasper-assets/icon.svg at build time so it can
+ * inherit CSS (a plain <img> could not be dimmed, glowed or theme-adjusted).
+ * Inkscape's editor cruft is stripped and the sizing is handed to CSS.
+ */
+import raw from '../../public/logo.svg?raw'
+
+interface Props {
+  class?: string
+  title?: string
+}
+const { class: klass = '', title } = Astro.props
+
+const svg = raw
+  .replace(/<\?xml[\s\S]*?\?>/g, '')
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replace(/<sodipodi:namedview[\s\S]*?\/>/g, '')
+  .replace(/\s(width|height)="[^"]*"/g, '')
+  .replace(/<svg/, `<svg class="logo ${klass}" role="img" aria-label="${title ?? 'Jasper'}" preserveAspectRatio="xMidYMid meet"`)
+---
+
+<Fragment set:html={svg} />
+
+<style is:global>
+  .logo {
+    height: 1em;
+    width: auto;
+    overflow: visible;
+  }
+
+  /* The mark's shadow facets are near-black, which vanishes on a dark page.
+     Lifting them slightly keeps the stone's depth readable in both themes. */
+  :root[data-theme='dark'] .logo [style*='fill:#2a2a2a'],
+  :root[data-theme='dark'] .logo [fill='#292929'],
+  :root:not([data-theme='light']) .logo [style*='fill:#2a2a2a'],
+  :root:not([data-theme='light']) .logo [fill='#292929'] {
+    fill: #4a403a;
+  }
+
+  :root[data-theme='dark'] .logo [style*='fill:#3c3b3b'],
+  :root:not([data-theme='light']) .logo [style*='fill:#3c3b3b'] {
+    fill: #5d5049;
+  }
+</style>

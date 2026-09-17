@@ -1,0 +1,262 @@
+---
+import { getCollection } from 'astro:content'
+import Base from '../../layouts/Base.astro'
+import Icon from '../../components/Icon.astro'
+import { site } from '../../site'
+
+const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order)
+
+const paths = [
+  {
+    goal: 'Using it',
+    order: ['checks', 'mcp'],
+    note: 'Start with the landing page, then the checks you will actually write.',
+  },
+  {
+    goal: 'Adopting it on a real codebase',
+    order: ['scaling', 'checks', 'languages'],
+    note: 'A legacy repo needs the grandfathering story before it needs the reference.',
+  },
+  {
+    goal: 'Changing it',
+    order: ['architecture', 'workflows', 'contributing'],
+    note: 'The seams make sense only once the diamond does.',
+  },
+]
+
+const byId = Object.fromEntries(docs.map((d) => [d.id, d]))
+---
+
+<Base title="Documentation" description="Jasper documentation — architecture, workflows, the ten checks, language support, MCP integration, scaling and contributing." wide>
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">documentation</span>
+      <h1 class="section-title">Everything Jasper does, <em>and what it does not</em>.</h1>
+      <p class="lede">
+        These pages are the repo's own <code class="k">docs/</code> directory, rendered.
+        They are the same files a contributor reads in the source tree, so they cannot
+        drift from it.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap grid-section">
+    <ul class="doc-grid">
+      {
+        docs.map((doc, i) => (
+          <li data-reveal style={`--delay:${i * 60}ms`}>
+            <a class="doc-card" href={`/docs/${doc.id}`}>
+              <span class="doc-card__n">{String(doc.data.order).padStart(2, '0')}</span>
+              <h2>{doc.data.label}</h2>
+              <p>{doc.data.summary}</p>
+              <span class="doc-card__go">
+                Read <Icon name="arrow" size={14} />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="wrap paths-section">
+    <header class="head" data-reveal>
+      <span class="eyebrow">reading order</span>
+      <h2 class="section-title">Depends what you came for.</h2>
+    </header>
+
+    <div class="paths">
+      {
+        paths.map((p, i) => (
+          <div class="path" data-reveal style={`--delay:${i * 90}ms`}>
+            <h3>{p.goal}</h3>
+            <ol>
+              {p.order.map((id) => (
+                <li>
+                  <a href={`/docs/${id}`}>{byId[id]?.data.label ?? id}</a>
+                </li>
+              ))}
+            </ol>
+            <p>{p.note}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="wrap repo-cta" data-reveal>
+    <div>
+      <h2>Reading the source is the other half</h2>
+      <p>
+        48 files, ~5.5k lines of production Go, one dependency. Every check is one file
+        in <code class="k">internal/engine/checks/</code>.
+      </p>
+    </div>
+    <a class="btn btn--primary" href={site.repo} target="_blank" rel="noopener">
+      <Icon name="github" /> Open the repository
+    </a>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(3rem, 7vw, 5rem) clamp(2rem, 4vw, 3rem);
+  }
+  .hero .lede {
+    max-width: 58ch;
+  }
+
+  .grid-section {
+    padding-bottom: clamp(3rem, 6vw, 4.5rem);
+  }
+
+  .doc-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.9rem;
+  }
+
+  .doc-card {
+    display: grid;
+    gap: 0.3rem;
+    height: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.3rem 1.35rem 1.15rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .doc-card::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--amber), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease);
+  }
+  .doc-card:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-3px);
+  }
+  .doc-card:hover::after {
+    transform: scaleX(1);
+  }
+
+  .doc-card__n {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    color: var(--amber-deep);
+  }
+  .doc-card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0.15rem;
+  }
+  .doc-card p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--fg-muted);
+    margin-top: 0.3rem;
+  }
+  .doc-card__go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 550;
+    color: var(--amber);
+    align-self: end;
+  }
+  .doc-card:hover .doc-card__go :global(svg) {
+    transform: translateX(3px);
+  }
+  .doc-card__go :global(svg) {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .paths-section {
+    padding-block: clamp(3rem, 6vw, 4.5rem);
+    border-top: 1px solid var(--line);
+  }
+  .head {
+    margin-bottom: 2rem;
+  }
+  .paths {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+  .path h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .path ol {
+    list-style: none;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    counter-reset: s;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .path li {
+    counter-increment: s;
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+  }
+  .path li::before {
+    content: counter(s);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--fg-faint);
+    padding-top: 0.2rem;
+  }
+  .path li a {
+    color: var(--fg-muted);
+    transition: color 0.2s var(--ease);
+  }
+  .path li a:hover {
+    color: var(--amber);
+  }
+  .path > p {
+    margin-top: 0.9rem;
+    font-size: 0.83rem;
+    color: var(--fg-faint);
+    line-height: 1.6;
+  }
+
+  .repo-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 4rem;
+    padding: clamp(1.4rem, 3vw, 2rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .repo-cta h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+  }
+  .repo-cta p {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+    max-width: 52ch;
+  }
+</style>

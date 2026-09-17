@@ -1,0 +1,327 @@
+---
+/**
+ * The pre-flight exchange, played as a sequence. The point being made is the
+ * timing: this happens while the agent is still deciding, for a file that does
+ * not exist on disk yet.
+ */
+---
+
+<div class="seq" data-anim>
+  <div class="seq__rail" aria-hidden="true"></div>
+
+  <ol class="seq__list">
+    <li class="msg msg--agent" style="--i:0">
+      <span class="msg__who">coding agent</span>
+      <div class="msg__body">
+        <p class="msg__say">“I need to write the tax calculator. It needs the database.”</p>
+        <code class="msg__call"
+          ><span class="fn">can_import</span>(<span class="arg">from</span>=<span class="str"
+            >"src/billing/tax.ts"</span
+          >, <span class="arg">spec</span>=<span class="str">"pg"</span>)</code
+        >
+        <span class="msg__meta">src/billing/tax.ts does not exist yet — that is fine</span>
+      </div>
+    </li>
+
+    <li class="msg msg--think" style="--i:1" aria-hidden="true">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="msg__meta">one snapshot, one hypothetical edge, 5&nbsp;ms</span>
+    </li>
+
+    <li class="msg msg--jasper" style="--i:2">
+      <span class="msg__who">jasper</span>
+      <div class="msg__body verdict">
+        <div class="verdict__head">
+          <span class="verdict__tag">DENIED</span>
+          <span class="verdict__sum"
+            >import of <code>"pg"</code> would violate a recorded decision</span
+          >
+        </div>
+        <dl class="verdict__grid">
+          <dt>decision</dt>
+          <dd><strong>DEC-002</strong> Datastore is PostgreSQL</dd>
+          <dt>rule</dt>
+          <dd>the database driver stays behind the db layer</dd>
+          <dt>fix</dt>
+          <dd>Access it through the layer at <code>src/db/**</code> instead.</dd>
+          <dt>why</dt>
+          <dd><code>.jasper/decisions/002-datastore.yaml</code></dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="msg msg--agent msg--done" style="--i:3">
+      <span class="msg__who">coding agent</span>
+      <div class="msg__body">
+        <code class="msg__call ok"
+          ><span class="kw">import</span> {'{'} query {'}'} <span class="kw">from</span>
+          <span class="str">'@/db'</span></code
+        >
+        <span class="msg__meta ok">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"
+            ><path
+              d="m3.5 8.4 3 3 6-6.8"
+              stroke="currentColor"
+              stroke-width="1.8"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path></svg
+          >
+          the violation was never written, so it never has to be found
+        </span>
+      </div>
+    </li>
+  </ol>
+</div>
+
+<style>
+  .seq {
+    position: relative;
+    display: grid;
+    gap: 0;
+  }
+
+  .seq__rail {
+    position: absolute;
+    left: 7px;
+    top: 14px;
+    bottom: 24px;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      var(--line-strong),
+      var(--amber) 45%,
+      var(--pass) 92%,
+      transparent
+    );
+    transform-origin: top;
+    transform: scaleY(0);
+    animation: rail 1.9s var(--ease-io) 0.2s forwards;
+    animation-play-state: var(--run, paused);
+  }
+  @keyframes rail {
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  .seq__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .msg {
+    position: relative;
+    padding-left: 2.4rem;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: msg-in 0.6s var(--ease) forwards;
+    animation-delay: calc(0.45s + var(--i) * 0.75s);
+    animation-play-state: var(--run, paused);
+  }
+  @keyframes msg-in {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .msg::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.35rem;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--line-strong);
+  }
+  .msg--jasper::before {
+    border-color: var(--amber);
+    background: var(--amber);
+    box-shadow: 0 0 0 4px var(--glow);
+  }
+  .msg--done::before {
+    border-color: var(--pass);
+  }
+  .msg--think::before {
+    display: none;
+  }
+
+  .msg__who {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    margin-bottom: 0.5rem;
+  }
+  .msg--jasper .msg__who {
+    color: var(--amber-deep);
+  }
+
+  .msg__body {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .msg__say {
+    color: var(--fg-muted);
+    font-size: 0.95rem;
+    font-style: italic;
+  }
+
+  .msg__call {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--line-strong);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 0.7rem 0.9rem;
+    color: var(--fg);
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .msg__call.ok {
+    border-left-color: var(--pass);
+  }
+  .msg__call .fn {
+    color: var(--amber);
+  }
+  .msg__call .arg {
+    color: var(--info);
+  }
+  .msg__call .str {
+    color: var(--pass);
+  }
+  .msg__call .kw {
+    color: var(--clay);
+  }
+
+  .msg__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--fg-faint);
+    font-family: var(--font-mono);
+  }
+  .msg__meta.ok {
+    color: var(--pass);
+  }
+
+  /* --- thinking --------------------------------------------------------- */
+  .msg--think {
+    padding-left: 2.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .dots {
+    display: inline-flex;
+    gap: 0.28rem;
+  }
+  .dots i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--amber-deep);
+    animation: bob 1.2s ease-in-out infinite;
+    animation-play-state: var(--run, paused);
+  }
+  .dots i:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .dots i:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  @keyframes bob {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.35;
+    }
+    30% {
+      transform: translateY(-4px);
+      opacity: 1;
+    }
+  }
+
+  /* --- the verdict card -------------------------------------------------- */
+  .verdict {
+    background: color-mix(in oklab, var(--fail) 6%, var(--surface));
+    border: 1px solid color-mix(in oklab, var(--fail) 40%, var(--line));
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    gap: 0.9rem;
+  }
+
+  .verdict__head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+  .verdict__tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--fail);
+    border: 1px solid color-mix(in oklab, var(--fail) 50%, transparent);
+    border-radius: 4px;
+    padding: 0.18rem 0.45rem;
+  }
+  .verdict__sum {
+    font-size: 0.92rem;
+    color: var(--fg);
+  }
+
+  .verdict__grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 1rem;
+    margin: 0;
+    font-size: 0.85rem;
+  }
+  .verdict__grid dt {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    padding-top: 0.16rem;
+  }
+  .verdict__grid dd {
+    margin: 0;
+    color: var(--fg-muted);
+  }
+  .verdict__grid strong {
+    color: var(--amber);
+    font-weight: 600;
+  }
+  .verdict__grid code,
+  .verdict__sum code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    color: var(--amber);
+  }
+
+  @media (max-width: 520px) {
+    .verdict__grid {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+    .verdict__grid dd {
+      margin-bottom: 0.5rem;
+    }
+  }
+</style>

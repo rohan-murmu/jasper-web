@@ -1,0 +1,413 @@
+---
+import { getCollection, render } from 'astro:content'
+import Base from '../../layouts/Base.astro'
+import Icon from '../../components/Icon.astro'
+import { site } from '../../site'
+import '../../styles/prose.css'
+
+export async function getStaticPaths() {
+  const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order)
+  return docs.map((doc, i) => ({
+    params: { slug: doc.id },
+    props: {
+      doc,
+      all: docs,
+      prev: docs[i - 1],
+      next: docs[i + 1],
+    },
+  }))
+}
+
+const { doc, all, prev, next } = Astro.props
+const { Content, headings } = await render(doc)
+
+// Only h2/h3 make it into the rail — deeper than that and it stops being a map.
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3)
+const editUrl = `${site.repo}/blob/main/docs/${doc.id}.md`
+---
+
+<Base title={doc.data.title} description={doc.data.summary} wide>
+  <div class="docs">
+    <!-- ---------- sidebar ---------- -->
+    <aside class="side">
+      <nav aria-label="Documentation">
+        <span class="side__head">Documentation</span>
+        <ul>
+          {
+            all.map((d) => (
+              <li>
+                <a href={`/docs/${d.id}`} class:list={{ 'is-current': d.id === doc.id }}>
+                  <span class="side__n">{String(d.data.order).padStart(2, '0')}</span>
+                  {d.data.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <span class="side__head side__head--gap">Elsewhere</span>
+        <ul>
+          <li><a href="/">Overview</a></li>
+          <li><a href="/docs">All docs</a></li>
+          <li>
+            <a href={site.repo} target="_blank" rel="noopener">Repository ↗</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- ---------- article ---------- -->
+    <article class="doc">
+      <header class="doc__head">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/docs">Docs</a>
+          <Icon name="chevron" size={12} />
+          <span>{doc.data.label}</span>
+        </nav>
+        <h1>{doc.data.title}</h1>
+        <p class="doc__sum">{doc.data.summary}</p>
+      </header>
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      <nav class="pager" aria-label="Pagination">
+        {
+          prev ? (
+            <a class="pager__link pager__link--prev" href={`/docs/${prev.id}`}>
+              <span>Previous</span>
+              <strong>{prev.data.label}</strong>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next && (
+            <a class="pager__link pager__link--next" href={`/docs/${next.id}`}>
+              <span>Next</span>
+              <strong>{next.data.label}</strong>
+            </a>
+          )
+        }
+      </nav>
+    </article>
+
+    <!-- ---------- on this page ---------- -->
+    <aside class="toc">
+      {
+        toc.length > 0 && (
+          <nav aria-label="On this page">
+            <span class="toc__head">On this page</span>
+            <ul>
+              {toc.map((h) => (
+                <li class:list={[`d-${h.depth}`]}>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+      <a class="toc__edit" href={editUrl} target="_blank" rel="noopener">
+        <Icon name="github" size={13} /> Edit this page
+      </a>
+    </aside>
+  </div>
+
+  <script>
+    // Highlights the heading currently nearest the top of the viewport.
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a[href^="#"]')]
+    const targets = links
+      .map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+      .filter((el): el is HTMLElement => Boolean(el))
+
+    if (targets.length) {
+      const seen = new Set<string>()
+
+      const spy = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) seen.add(e.target.id)
+            else seen.delete(e.target.id)
+          }
+
+          // Fall back to the last heading scrolled past, so the rail never goes
+          // blank between two widely spaced sections.
+          let activeId = targets.find((t) => seen.has(t.id))?.id
+          if (!activeId) {
+            const passed = targets.filter((t) => t.getBoundingClientRect().top < 120)
+            activeId = passed.at(-1)?.id
+          }
+
+          for (const a of links) {
+            a.classList.toggle('is-active', decodeURIComponent(a.hash.slice(1)) === activeId)
+          }
+        },
+        { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
+      )
+
+      targets.forEach((t) => spy.observe(t))
+    }
+  </script>
+
+  <style>
+    .docs {
+      max-width: 1400px;
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr) 210px;
+      gap: clamp(1.5rem, 3.5vw, 3rem);
+      align-items: start;
+    }
+
+    /* ---------- sidebar ---------- */
+    .side {
+      position: sticky;
+      top: 5.5rem;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+      padding-block: 2.5rem 2rem;
+      scrollbar-width: thin;
+    }
+    .side__head {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 0.7rem;
+    }
+    .side__head--gap {
+      margin-top: 1.9rem;
+    }
+    .side ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.1rem;
+    }
+    .side a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.55rem;
+      padding: 0.4rem 0.6rem;
+      border-radius: 7px;
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      border-left: 2px solid transparent;
+      transition: color 0.2s var(--ease), background 0.2s var(--ease),
+        border-color 0.2s var(--ease);
+    }
+    .side a:hover {
+      color: var(--fg);
+      background: var(--surface);
+    }
+    .side a.is-current {
+      color: var(--amber);
+      background: color-mix(in oklab, var(--amber) 8%, transparent);
+      border-left-color: var(--amber);
+      font-weight: 550;
+    }
+    .side__n {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      color: var(--fg-faint);
+    }
+    .side a.is-current .side__n {
+      color: var(--amber-deep);
+    }
+
+    /* ---------- article ---------- */
+    .doc {
+      padding-block: 2.5rem 4rem;
+      min-width: 0;
+    }
+
+    .doc__head {
+      padding-bottom: 1.75rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      color: var(--fg-faint);
+      margin-bottom: 0.9rem;
+    }
+    .crumbs a {
+      color: var(--fg-muted);
+      transition: color 0.2s var(--ease);
+    }
+    .crumbs a:hover {
+      color: var(--amber);
+    }
+    .doc__head h1 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.1rem, 4.6vw, 3rem);
+      line-height: 1.08;
+    }
+    .doc__sum {
+      margin-top: 0.8rem;
+      font-size: 1.02rem;
+      color: var(--fg-muted);
+      max-width: 62ch;
+      line-height: 1.65;
+    }
+
+    /* The first h2 sits right under the header rule, so it does not need its own. */
+    .doc :global(.prose > h2:first-child) {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    /* ---------- pager ---------- */
+    .pager {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--line);
+    }
+    .pager__link {
+      display: grid;
+      gap: 0.2rem;
+      padding: 1rem 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+    }
+    .pager__link:hover {
+      border-color: var(--amber-deep);
+      transform: translateY(-2px);
+    }
+    .pager__link--next {
+      text-align: right;
+      grid-column: 2;
+    }
+    .pager__link span {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+    .pager__link strong {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    /* ---------- on this page ---------- */
+    .toc {
+      position: sticky;
+      top: 5.5rem;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+      padding-block: 2.5rem 2rem;
+      scrollbar-width: thin;
+    }
+    .toc__head {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 0.7rem;
+    }
+    .toc ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-left: 1px solid var(--line);
+    }
+    .toc li a {
+      display: block;
+      padding: 0.3rem 0 0.3rem 0.8rem;
+      margin-left: -1px;
+      border-left: 1px solid transparent;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: var(--fg-faint);
+      transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+    }
+    .toc li.d-3 a {
+      padding-left: 1.5rem;
+      font-size: 0.775rem;
+    }
+    .toc li a:hover {
+      color: var(--fg-muted);
+    }
+    .toc li a.is-active {
+      color: var(--amber);
+      border-left-color: var(--amber);
+    }
+    .toc__edit {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--fg-faint);
+      transition: color 0.2s var(--ease);
+    }
+    .toc__edit:hover {
+      color: var(--amber);
+    }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 1180px) {
+      .docs {
+        grid-template-columns: 200px minmax(0, 1fr);
+      }
+      .toc {
+        display: none;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .docs {
+        grid-template-columns: 1fr;
+      }
+      .side {
+        position: static;
+        max-height: none;
+        padding-block: 1.75rem 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .side ul {
+        grid-auto-flow: column;
+        grid-auto-columns: max-content;
+        overflow-x: auto;
+        padding-bottom: 0.75rem;
+      }
+      .side__head--gap,
+      .side ul:last-of-type {
+        display: none;
+      }
+      .side a {
+        white-space: nowrap;
+      }
+      .doc {
+        padding-top: 1.75rem;
+      }
+      .pager {
+        grid-template-columns: 1fr;
+      }
+      .pager__link--next {
+        grid-column: 1;
+      }
+    }
+  </style>
+</Base>
