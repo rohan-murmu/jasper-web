@@ -38,8 +38,14 @@ MyProjects/
 └── jasper-web/      you are here
 ```
 
-`src/content/docs/` is generated and git-ignored. Edit
-`../jasper/docs/*.md` instead; the sync picks it up on the next `dev` or `build`.
+`src/content/docs/` is generated **and committed** — a deploy host only checks
+out this repository, so the markdown has to ship with it. When the sibling repo
+is missing, `sync:docs` logs a notice and builds from the committed copy instead
+of failing.
+
+Edit `../jasper/docs/*.md`, never the files under `src/content/docs/`. The sync
+picks the change up on the next `dev` or `build`, tells you the vendored copy
+moved, and **the change only reaches the deployed site once you commit it.**
 
 Two small plugins keep the markdown usable as a website:
 
@@ -80,15 +86,20 @@ Diagrams live in `src/components/`: `DriftDiagram`, `LoopDiagram`,
 
 ## Deploying
 
-The build is plain static files in `dist/` — any static host will serve it.
-Set the canonical origin at build time so `sitemap.xml` and the `<link rel=canonical>`
-tags are right:
+The build is plain static files in `dist/` — any static host will serve it, and
+it needs nothing but this repository.
+
+| Setting | Value |
+|---------|-------|
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Install command | `npm install` |
+
+Set the canonical origin so `sitemap.xml` and the `<link rel="canonical">` tags
+are right. The default in `astro.config.mjs` is a placeholder:
 
 ```sh
 SITE_URL=https://your-domain npm run build
 ```
 
-The default in `astro.config.mjs` is a placeholder. Deploying to a host that
-does not have the `jasper` repo checked out alongside this one will fail at
-`sync:docs` — vendor `src/content/docs/` into the build, or check out both
-repositories in CI.
+On Vercel or Netlify, set `SITE_URL` as an environment variable instead.

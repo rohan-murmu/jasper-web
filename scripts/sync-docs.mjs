@@ -27,11 +27,25 @@ const PAGES = {
 
 const yaml = (s) => `"${String(s).replace(/"/g, '\\"')}"`
 
+// The synced markdown is committed, so a build host that only checks out this
+// repository (Vercel, Netlify, a CI runner) has everything it needs. The sync is
+// a convenience for whoever has the jasper repo checked out next door.
 if (!existsSync(SOURCE)) {
+  const vendored = existsSync(DEST) && (await readdir(DEST)).some((f) => f.endsWith('.md'))
+
+  if (vendored) {
+    console.log(`  · no sibling jasper/ repo — using the ${(await readdir(DEST)).length} committed docs`)
+    process.exit(0)
+  }
+
   console.error(
-    `\n  ✗ Cannot find the Jasper repo docs at:\n      ${SOURCE}\n\n` +
+    `\n  ✗ No docs to build from.\n\n` +
+      `  Nothing is committed in src/content/docs/, and the jasper repo is not\n` +
+      `  checked out next door at:\n      ${SOURCE}\n\n` +
       `  jasper-web expects the jasper repo as a sibling directory:\n` +
-      `      MyProjects/\n        jasper/       <- the Go CLI, with docs/\n        jasper-web/   <- you are here\n`
+      `      MyProjects/\n        jasper/       <- the Go CLI, with docs/\n        jasper-web/   <- you are here\n\n` +
+      `  Check both out side by side, run \`npm run sync:docs\`, and commit\n` +
+      `  src/content/docs/.\n`
   )
   process.exit(1)
 }
@@ -96,3 +110,7 @@ const parts = [`${expected.size} docs`]
 if (written) parts.push(`${written} updated`)
 if (removed) parts.push(`${removed} removed`)
 console.log(`  ✓ ${parts.join(' · ')} — from ${SOURCE}`)
+
+if (written || removed) {
+  console.log('    ↳ src/content/docs/ changed — commit it, or the deployed site stays behind')
+}
