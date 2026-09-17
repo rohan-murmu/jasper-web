@@ -430,48 +430,6 @@ const tools = [
   </section>
 
   <hr class="rule" />
-
-  <!-- ==================================================================
-       Status
-       ================================================================== -->
-  <section class="section section--tight" id="status">
-    <div class="wrap">
-      <div class="status">
-        <div class="status__col" data-reveal>
-          <span class="eyebrow">status</span>
-          <h2 class="section-title">v1, early, and <em>honest about it</em>.</h2>
-          <p class="lede">
-            Self-enforcing: <code class="k">jasper check</code> on Jasper's own repo
-            passes nine compiled checks. ~5.5k lines of production Go, ~1.5k lines of
-            tests, one dependency.
-          </p>
-        </div>
-
-        <ul class="limits" data-reveal style="--delay:100ms">
-          <li>
-            The import graph is the unit of analysis. Jasper sees
-            <code>require("pg")</code>; it does not see a raw SQL string, a dynamically
-            constructed import, or a shell-out.
-          </li>
-          <li>
-            TypeScript and Python imports come from a tokenizer, not a full parser. The
-            <code>scan.Language</code> seam exists so one language can move to tree-sitter
-            without touching anything else.
-          </li>
-          <li>
-            Rust module resolution uses longest-existing-prefix — right for the common
-            layout, wrong for <code>#[path]</code> attributes.
-          </li>
-          <li>
-            <code>Scope.since</code> (git-rev grandfathering) parses but is not yet
-            applied. The snapshot cache is computed but not yet used.
-          </li>
-          <li>No LSP port, no <code>jasper decide</code> command, no multi-repo batch mode.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
   <!-- ==================================================================
        CTA
        ================================================================== -->
@@ -1009,45 +967,6 @@ const tools = [
     margin-top: clamp(2.5rem, 5vw, 3.5rem);
   }
 
-  /* ====================================================================
-     Status
-     ==================================================================== */
-  .status {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: clamp(1.75rem, 4vw, 3.5rem);
-    align-items: start;
-  }
-  .limits {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.9rem;
-  }
-  .limits li {
-    position: relative;
-    padding-left: 1.5rem;
-    font-size: 0.9rem;
-    line-height: 1.65;
-    color: var(--fg-muted);
-  }
-  .limits li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.62em;
-    width: 7px;
-    height: 7px;
-    border-radius: 2px;
-    background: var(--line-strong);
-    transform: rotate(45deg);
-  }
-  .limits code {
-    font-family: var(--font-mono);
-    font-size: 0.85em;
-    color: var(--clay);
-  }
 
   /* ====================================================================
      CTA
