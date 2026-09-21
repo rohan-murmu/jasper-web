@@ -22,8 +22,9 @@ Two standards specific to this codebase:
 
 **A check without a rejection test will be asked for one.** Every check must
 have a test asserting it *refuses a bad config* — a typo'd field, a missing
-required field, a wrong type. A rule that compiles but matches nothing is
-invisible, and it is the exact failure mode this project exists to prevent.
+required field, a wrong type. A rule that compiles but matches nothing is a
+guardrail that silently is not there, and it is the exact failure mode this
+project exists to prevent.
 Use `mustReject` from `internal/engine/checks/helpers_test.go`.
 
 **Comments explain why, not what.** The codebase is dense with rationale

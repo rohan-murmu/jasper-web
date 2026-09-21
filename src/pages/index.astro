@@ -69,7 +69,7 @@ const tools = [
   <section class="hero">
     <div class="wrap hero__inner">
       <span class="hero__badge">
-        <i></i> v1 · one static binary · CLI&nbsp;+&nbsp;MCP
+        <i></i> v1 · architectural guardrail · CLI&nbsp;+&nbsp;MCP
       </span>
 
       <h1 class="display hero__h1">
@@ -77,10 +77,11 @@ const tools = [
       </h1>
 
       <p class="lede hero__lede">
-        Your coding agent makes architectural decisions every hour. Jasper records
-        them, and tells the agent — or the build — the moment the code stops
-        honoring them. Not a spec generator, not a workflow engine: it sits
-        <em> underneath</em> Claude Code, Cursor or Codex and does exactly one thing.
+        Your coding agent makes architectural decisions every hour. Jasper records them
+        as machine-checkable policy, and tells the agent — or the build — the moment
+        the code stops honoring them. Not a spec generator, not a linter, not a workflow
+        engine: it is a <em>guardrail</em> that sits underneath Claude Code, Cursor or
+        Codex and does exactly one thing.
       </p>
 
       <div class="hero__cta">
@@ -340,18 +341,46 @@ const tools = [
         </aside>
       </div>
 
-      <div class="gate" data-reveal>
-        <div class="gate__half">
-          <span class="gate__tag">advisory</span>
-          <h4>MCP catches it before it is written</h4>
-          <p>An agent can decline to call a tool. Useful, and not a guarantee.</p>
+      <div class="gate-block" id="guardrail">
+        <header class="head head--center" data-reveal>
+          <span class="eyebrow" style="justify-content:center">the guardrail</span>
+          <h3 class="section-title" style="margin-inline:auto">
+            Two rails. <em>One of them holds</em>
+          </h3>
+          <p class="lede lede--center">
+            Both rails compile the same decision files through the same engine, so the
+            answer an agent gets before writing is the answer CI gives afterwards.
+          </p>
+        </header>
+
+        <div class="gate" data-reveal>
+          <div class="gate__half">
+            <span class="gate__tag">advisory</span>
+            <h4>MCP catches it before it is written</h4>
+            <p>
+              The agent asks <code class="k">can_import</code> and
+              <code class="k">can_add_dependency</code> and gets a verdict. It can also
+              decline to ask. Useful, and not a guarantee.
+            </p>
+          </div>
+          <div class="gate__div" aria-hidden="true"></div>
+          <div class="gate__half gate__half--hard">
+            <span class="gate__tag">enforcing</span>
+            <h4>The CLI does not depend on cooperation</h4>
+            <p>
+              <code class="k">jasper check</code> is a separate binary with its own exit
+              code, run by CI or a git hook. It holds whether the agent plays along or not.
+            </p>
+          </div>
         </div>
-        <div class="gate__div" aria-hidden="true"></div>
-        <div class="gate__half gate__half--hard">
-          <span class="gate__tag">enforcing</span>
-          <h4>The CLI does not depend on cooperation</h4>
-          <p>Keep a gate in CI regardless. That one holds whether the agent plays along or not.</p>
-        </div>
+
+        <p class="gate__note" data-reveal>
+          Jasper intercepts nothing — no daemon, no file watcher, no sandbox, no hook into
+          the agent's own tool calls. It is a gate you position, not a guard that patrols.
+          And an agent cannot widen its own policy: <code>propose_decision</code> writes
+          <code>status: proposed</code>, which the engine skips until a human accepts it in
+          review.
+        </p>
       </div>
     </div>
   </section>
@@ -900,6 +929,26 @@ const tools = [
     font-size: 0.86rem;
     color: var(--ink-soft);
     line-height: 1.7;
+  }
+
+  .gate-block {
+    margin-top: clamp(3.5rem, 7vw, 5.5rem);
+  }
+  .gate-block .gate {
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  }
+  .gate__note {
+    max-width: 62ch;
+    margin: 1.4rem auto 0;
+    text-align: center;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+  }
+  .gate__note code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    color: var(--ink);
   }
 
   /* ====================================================================

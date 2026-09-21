@@ -1,12 +1,18 @@
 ---
 title: "MCP integration"
 label: "MCP integration"
-summary: "Setup, transport, the seven tools, verdict semantics and agent prompting."
+summary: "The advisory rail: setup, transport, the seven tools, verdict semantics and agent prompting."
 order: 5
 ---
 Jasper ships an MCP server so a coding agent can ask a question *while
 deciding*, rather than finding out at commit time. It is the difference between
 "you may not do that" and "you should not have done that."
+
+This is the guardrail's **advisory rail**. It runs the same decision files
+through the same engine as `jasper check`, so its answers match the gate exactly
+— but an agent can decline to call a tool, so it is a preview of enforcement,
+not enforcement itself. Pair it with the CLI rail; see [Limits](#limits) below, and the
+[project README](../README.md) for what the guardrail deliberately does not do.
 
 ## Setup
 
@@ -218,11 +224,13 @@ your codebase; everything else is theory.
 
 ## Limits
 
-MCP is **advisory**. An agent can decline to call a tool, ignore a denial, or
-not support MCP at all. Nothing here intercepts a file write — there is no
-daemon, no watcher, no filesystem hook.
+MCP is **advisory**, and that is a property of the design, not a gap to be
+closed later. An agent can decline to call a tool, ignore a denial, or not
+support MCP at all. Nothing here intercepts a file write — there is no daemon,
+no watcher, no filesystem hook, and no interception of the agent's own tool
+calls. Treating this rail as a guarantee is the one way to misuse Jasper.
 
-Keep a gate that does not depend on cooperation:
+Keep the enforcing rail, which does not depend on cooperation:
 
 ```sh
 jasper check --format github          # CI

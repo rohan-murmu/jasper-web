@@ -14,7 +14,9 @@ Everything in Jasper is arranged to protect this:
 
 A pure function with a thin impure shell. `scan` reads the filesystem once and
 produces an immutable `Snapshot`; every check is a function of that snapshot
-and nothing else. That property is what lets the identical engine run in a CLI,
+and nothing else. This is also why the guardrail's two rails cannot disagree:
+the advisory MCP port and the enforcing CLI are two callers of one engine, not
+two implementations of one policy. That property is what lets the identical engine run in a CLI,
 an MCP server, a CI job, and (later) a batch over hundreds of repositories
 without modification — and it is why the MCP port could answer "may I import
 this?" for a file that does not exist: a hypothetical is just a second

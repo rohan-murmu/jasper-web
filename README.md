@@ -1,7 +1,7 @@
 # jasper-web
 
 The marketing and documentation site for [**Jasper**](https://github.com/rohan-murmu/jasper) —
-architectural decisions, enforced.
+an architectural guardrail for coding agents.
 
 Built with [Astro](https://astro.build). Static output, no client framework, no
 image assets: every diagram on the site is inline SVG animated with CSS.

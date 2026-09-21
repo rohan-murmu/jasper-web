@@ -1,9 +1,9 @@
 /** Every outward-facing constant lives here so nothing is duplicated in markup. */
 export const site = {
   name: 'Jasper',
-  tagline: 'Architectural decisions, enforced.',
+  tagline: 'An architectural guardrail for coding agents.',
   description:
-    'Jasper turns the architectural decisions your coding agent makes into checks that run on every commit — and answers the agent’s questions while it is still deciding.',
+    'Jasper is an architectural guardrail for coding agents. It records the decisions your agent makes as machine-checkable policy, answers the agent’s questions over MCP before it writes, and fails the build in CI when the code stops honoring them.',
   repo: 'https://github.com/rohan-murmu/jasper',
   issues: 'https://github.com/rohan-murmu/jasper/issues',
   license: 'https://github.com/rohan-murmu/jasper/blob/main/LICENSE',

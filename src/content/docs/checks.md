@@ -1,11 +1,17 @@
 ---
 title: "Check reference"
 label: "Check reference"
-summary: "All ten check primitives, every field, defaults, gotchas and worked examples."
+summary: "The guardrail's policy vocabulary: all ten check primitives, every field, gotchas and worked examples."
 order: 3
 ---
 Ten primitives. `jasper checks` lists the registered kinds; each is one file in
 `internal/engine/checks/`.
+
+These are the guardrail's policy vocabulary: the complete set of architectural
+rules Jasper can express as something a machine decides, rather than something a
+reviewer notices. A decision whose constraint cannot be written with one of
+these stays an advisory note — it reaches the agent through `brief`, but it
+cannot fail a build.
 
 Every check rejects unrecognised fields at load time. A typo is an error with a
 filename, not a rule that silently enforces nothing:

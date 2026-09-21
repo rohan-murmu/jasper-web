@@ -181,7 +181,8 @@ segments of a `use` are usually item names rather than modules.
 
 ## What no language sees
 
-Worth stating plainly, because it bounds what any decision can enforce:
+Worth stating plainly, because it bounds the guardrail: no decision can enforce
+what no language sees, on either rail.
 
 - A raw SQL string. `forbid_dependency: [mongodb]` catches the driver, not a
   hand-rolled wire protocol.

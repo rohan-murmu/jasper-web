@@ -1,10 +1,15 @@
 ---
 title: "Workflows"
 label: "Workflows"
-summary: "init, check, MCP pre-flight and propose — each lifecycle end to end."
+summary: "init, check, MCP pre-flight and propose — each lifecycle end to end, and where each rail catches drift."
 order: 2
 ---
 Five flows: `init`, `check`, MCP pre-flight, `propose`, and the loop they form.
+
+Two of them are the guardrail's rails. MCP pre-flight is advisory — the agent
+asks. `jasper check` is enforcing — CI asks, and the agent does not get a vote.
+[When each gate catches drift](#when-each-gate-catches-drift) sets out what
+each one costs you.
 
 ## The loop
 
@@ -36,7 +41,8 @@ Five flows: `init`, `check`, MCP pre-flight, `propose`, and the loop they form.
 
 The cycle is the product: code → `init` → YAML → `brief`/MCP → agent → code →
 `check`. Each arrow is a separate command, and none of them runs in the
-background. Jasper is a gate you position, not a guard that patrols.
+background. Jasper is a gate you position, not a guard that patrols — a
+guardrail made of checkpoints you choose, not of interception.
 
 ## 1. `jasper check` — the load-bearing path
 
@@ -239,12 +245,14 @@ existing hook's shebang if one is there.
 
 ## When each gate catches drift
 
-| Wiring | Caught at | Cost of the catch |
-|--------|-----------|-------------------|
-| MCP pre-flight | while the agent is deciding | one tool call |
-| agent runs `check_architecture` | end of the agent's turn | a few edits to undo |
-| pre-commit hook | `git commit` | a working tree to unwind |
-| CI | pull request | possibly dozens of commits built on the mistake |
+| Wiring | Rail | Caught at | Cost of the catch |
+|--------|------|-----------|-------------------|
+| MCP pre-flight | advisory | while the agent is deciding | one tool call |
+| agent runs `check_architecture` | advisory | end of the agent's turn | a few edits to undo |
+| pre-commit hook | enforcing | `git commit` | a working tree to unwind |
+| CI | enforcing | pull request | possibly dozens of commits built on the mistake |
 
-All four are worth having. Only the last two are enforcement; the first two are
-cooperation, and an agent can decline.
+All four are worth having, and they are not interchangeable. Only the last two
+are enforcement; the first two are cooperation, and an agent can decline. A
+deployment with only the advisory rail is not a guardrail — it is guidance that
+happens to be accurate.

@@ -17,10 +17,10 @@ const DEST = resolve(here, '../src/content/docs')
 /** slug → [order, nav label, one-line summary]. Anything not listed is skipped. */
 const PAGES = {
   architecture: [1, 'Architecture', 'Layers, seams, the purity boundary, and the data flow that holds it all together.'],
-  workflows: [2, 'Workflows', 'init, check, MCP pre-flight and propose — each lifecycle end to end.'],
-  checks: [3, 'Check reference', 'All ten check primitives, every field, defaults, gotchas and worked examples.'],
+  workflows: [2, 'Workflows', 'init, check, MCP pre-flight and propose — each lifecycle end to end, and where each rail catches drift.'],
+  checks: [3, 'Check reference', 'The guardrail\'s policy vocabulary: all ten check primitives, every field, gotchas and worked examples.'],
   languages: [4, 'Languages', 'Go, TypeScript, Python and Rust: extraction, resolution and honest limits.'],
-  mcp: [5, 'MCP integration', 'Setup, transport, the seven tools, verdict semantics and agent prompting.'],
+  mcp: [5, 'MCP integration', 'The advisory rail: setup, transport, the seven tools, verdict semantics and agent prompting.'],
   scaling: [6, 'Scaling', 'Measured performance, monorepos and adopting Jasper on a legacy codebase.'],
   contributing: [7, 'Contributing', 'Adding a check, a language or a port — with real diffs.'],
 }

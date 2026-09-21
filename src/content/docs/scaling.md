@@ -5,7 +5,9 @@ summary: "Measured performance, monorepos and adopting Jasper on a legacy codeba
 order: 6
 ---
 Two different questions: will it run fast enough, and will a team actually keep
-it on. The second one is harder.
+it on. The second one is harder — and it is the one that decides whether you
+have a guardrail or a disabled one. A rule that fires constantly gets removed,
+and a removed rule enforces nothing.
 
 ## Measured performance
 
@@ -174,7 +176,7 @@ The decisions themselves rot, and Jasper does not warn you:
 
 ## What Jasper will not scale to
 
-Being explicit about the boundary:
+Being explicit about the boundary of the guardrail:
 
 - It analyses declared dependencies and static import edges. A raw SQL string,
   a shell-out, a dynamically built import path, and anything behind reflection
